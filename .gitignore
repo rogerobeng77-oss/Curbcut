@@ -4,5 +4,5 @@ __pycache__/
 .pytest_cache/
 *.egg-info/
 .harness/
-substrate/_axe.min.js
+app/_axe.min.js
 screenshots/
