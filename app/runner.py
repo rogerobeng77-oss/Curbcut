@@ -51,10 +51,12 @@ class RunResult:
         committed: every rejected patch was reverted before that scan, and any
         patch dropped *at* the gate puts an entry in ``reappeared``.
 
-        ``reappeared`` covers both a target that came back and a new violation
-        nobody attributed to a patch; either way the page is worse than the
-        gate's snapshot describes, because dropping a patch at the gate edits
-        the tree again after that snapshot was taken.
+        ``reappeared`` covers two different things, and neither is shippable. A
+        target that came back is dropped at the gate, and dropping it reverts
+        the file *after* the scan, so the committed tree is no longer the tree
+        the gate looked at. A violation at an identity no patch in the run
+        claimed is left alone -- the tree does match the scan there -- but the
+        page carries a violation this run cannot account for.
 
         Not part of this: ``audit_complete``. A patch is verified by the final
         scan, which happens in this process; whether the record of that scan
@@ -224,6 +226,18 @@ def _grade(
     have left behind -- either the fixed one came back, or a second node now
     has the same identity. A set comparison sees neither.
 
+    Over-counts only. There is deliberately no check that the final scan saw
+    *fewer* violations than the baseline, because with no over-count that is
+    already true and cannot be otherwise: ``expected`` is the baseline counter
+    minus one per candidate, every candidate came from the baseline so no
+    identity goes negative, and ``sum(expected) == len(baseline) - len(fixed)``.
+    An empty ``over`` means ``seen[i] <= expected[i]`` for every identity, so
+    ``len(final) <= len(baseline) - len(verified)``. A separate assertion of
+    that is a restatement of this loop, not a second opinion on it.
+    An *under*-count is not a fault at all and must not be flagged: one patch
+    can resolve two violations (adding alt text to a linked image clears both
+    ``image-alt`` and ``link-name``), so a violation the run never targeted can
+    legitimately be gone from the final scan.
     """
     expected = Counter(identity(v) for v in baseline)
     for violation, _patch in fixed:
@@ -290,7 +304,7 @@ def _final_gate(
     _audit(
         store,
         run_id,
-        {"step": "final_scan", "ok": True, "found": len(final)},
+        {"step": "final_scan", "ok": True, "found": len(final), "baseline": len(baseline)},
         result,
     )
 

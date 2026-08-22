@@ -603,3 +603,82 @@ def test_a_gate_that_breaks_after_the_scan_says_it_could_not_verify(tmp_path, mo
         '  <img src="hero.png" alt="Hero">',
     ]
     assert all("final_gate_failed: RuntimeError" in e["error"] for e in result.unreverted)
+
+
+# --- The gate deliberately has no under-count check ------------------------
+
+
+def test_no_reappearance_implies_fewer_violations_than_the_baseline(tmp_path):
+    """The under-count check the gate does not have, asserted as the property
+    it already satisfies: with no over-count, the final scan cannot see more
+    than ``baseline - verified`` violations. A runtime check would restate the
+    counting loop rather than audit it."""
+    root = _setup_two(tmp_path)
+    store = _store()
+
+    result = run_remediation(
+        FakeModel([LOGO_FIX, HERO_FIX]), store, "run-undercount", root, "http://x",
+        scan=_scans([VIOLATION, HERO], []),
+        verifier=lambda url, target, baseline, scan=None: Verdict.RESOLVED,
+    )
+
+    assert result.reappeared == []
+    assert len(result.verified) == 2
+    entry = [e for e in store.audit_trail("run-undercount") if e["step"] == "final_scan"][0]
+    assert entry["baseline"] == 2
+    assert entry["found"] <= entry["baseline"] - len(result.verified)
+
+
+def test_a_resolution_the_run_never_targeted_is_not_a_fault(tmp_path):
+    """Why an under-count must not be flagged. One patch can clear two
+    violations: adding alt text to the linked image fixes ``image-alt`` and
+    ``link-name`` together. ``link-name`` is still in ``expected`` -- no patch
+    claimed it -- and absent from the final scan. That is the fix working, not
+    a miscount."""
+    (tmp_path / "index.html").write_text(f"<main>\n{MAP_LINE}\n</main>\n")
+    fixed_alt = '    <a href="/map"><img src="map-thumb.png" alt="Trail map"></a>'
+    store = _store()
+
+    result = run_remediation(
+        FakeModel([_reply(MAP_LINE, fixed_alt), "sorry, no idea"]),
+        store, "run-twofer", str(tmp_path), "http://x",
+        scan=_scans([MAP_IMAGE_ALT, MAP_LINK_NAME], []),
+    )
+
+    assert [p.new for p in result.verified] == [fixed_alt]
+    assert result.triaged == [{"rule": "link-name", "reason": "no_patch"}]
+    assert result.reappeared == []
+    assert result.safe_to_ship
+    entry = [e for e in store.audit_trail("run-twofer") if e["step"] == "final_scan"][0]
+    assert (entry["baseline"], entry["found"]) == (2, 0)
+
+
+def test_an_unattributed_reappearance_leaves_the_tree_matching_the_scan(tmp_path):
+    """Why ``safe_to_ship``'s old wording was wrong. ``reappeared`` does not
+    imply a patch was dropped: an over-count at an identity no candidate
+    claimed drops nothing, so no revert runs after the final scan and the tree
+    still matches what the gate saw. The run is unshippable anyway -- the page
+    carries a violation it cannot account for -- but not for that reason."""
+    root = _setup(tmp_path)
+    stranger = Violation(
+        rule="button-name",
+        selector="#submit",
+        html="<button></button>",
+        impact="critical",
+        description="Buttons must have discernible text",
+    )
+    result = run_remediation(
+        FakeModel([LOGO_FIX]), _store(), "run-unattributed", root, "http://x",
+        scan=_scans([VIOLATION], [stranger]),
+        verifier=lambda url, target, baseline, scan=None: Verdict.RESOLVED,
+    )
+
+    assert [p.new for p in result.verified] == ['  <img src="logo.png" alt="Logo">']
+    assert result.reappeared == [
+        {"rule": "button-name", "selector": "#submit", "seen": 1, "expected": 0}
+    ]
+    assert result.triaged == [], "no patch was dropped, so nothing was reverted"
+    assert result.tree_modified is False
+    assert not result.safe_to_ship
+    lines = (tmp_path / "index.html").read_text().splitlines()
+    assert lines[1] == '  <img src="logo.png" alt="Logo">', "tree is what the gate scanned"
