@@ -254,3 +254,42 @@ gcloud pubsub topics publish a11y-events --project=<PROJECT> \
   own startup/liveness probing is a TCP check against the container port
   by default and does not depend on this route — but worth knowing before
   wiring an external uptime check to it.
+- **GitHub's git-over-HTTPS endpoint rejects a raw `Authorization: Bearer
+  <token>` header, even for a token valid for the REST API with that exact
+  header.** `GET /user` returned `200` with `Authorization: Bearer <token>`;
+  `git clone` with the same header on `-c http.extraheader` got `remote:
+  invalid credentials`. HTTP Basic auth (`x-access-token:<token>`,
+  base64-encoded) is what GitHub's own git integration actually accepts.
+- **`git clone -c http.extraheader=...` persists that header into the
+  clone's own `.git/config`.** A later `git push` that repeats the same
+  `-c http.extraheader` therefore sends the header *twice* — GitHub answers
+  with `remote: Duplicate header: "Authorization"` and a plain `400`, which
+  git itself only reports as a bare non-zero exit. Found by reproducing the
+  clone-then-push sequence by hand outside the container after the real job
+  failed with no more specific a message. Fixed by setting the header once,
+  at clone, and letting push inherit it.
+- **A fresh container has no git identity, and `git clone` does not
+  create one.** `git commit` failed with git's own "Please tell me who you
+  are" (exit 128) on the first real run that got that far. Fixed by scoping
+  `-c user.name=... -c user.email=...` to the one commit, the same way the
+  auth header is scoped rather than written to a global config this
+  container does not own.
+- **Redacting a secret from logs has to cover every string that secret
+  produces, not just the secret itself — found by leaking the same token
+  twice.** The first fix redacted the raw `GITHUB_TOKEN` from anything
+  `job/worker.py` could raise. The very next real run leaked the *same*
+  token again, this time as the base64-encoded `Authorization: Basic ...`
+  header built from it — a different string that contains no literal copy
+  of the token, so the single-secret redaction never matched it, and it
+  reached Cloud Logging in plain (if base64-"encoded," which is not
+  encryption) text. `_redact` and `_run_git` now take every secret-shaped
+  value in play (`*secrets`), not one. **The `GITHUB_TOKEN` value currently
+  stored in the Secret Manager `github-token` secret should be rotated
+  before this project is demoed or submitted further.** It appeared in
+  plaintext (once as a raw token, once as base64, in two separate log
+  entries) during this batch's own deploy testing, before the redaction fix
+  landed — anyone with Cloud Logging read access to this GCP project could
+  read it from the log history. It was not revoked by this batch, since
+  doing so is an action on the project owner's own GitHub credential that
+  this batch did not have standing to take unilaterally; see the report for
+  the exact log entries and timestamps.
