@@ -714,3 +714,26 @@ def test_a_recovery_arm_that_breaks_still_returns_and_flags_the_tree(tmp_path, m
     ]
     assert result.tree_modified is True
     assert not result.safe_to_ship
+
+
+def test_an_audit_failure_on_the_error_step_still_reverts_the_patch(tmp_path):
+    """The recovery arm's own first act is an audit write. Unguarded it lands in
+    the last-resort arm, which downgrades a violation that would have been
+    cleanly reverted into one whose tree state is unknown -- the run survives
+    either way, so only this test tells the two apart."""
+    root = _setup_two(tmp_path)
+    store = BlowUpStore("error")
+
+    result = run_remediation(
+        FakeModel([LOGO_FIX, HERO_FIX]), store, "run-error-audit", root, "http://x",
+        scan=_scans([VIOLATION, HERO], [HERO]),
+        verifier=_boom_on_hero,
+    )
+
+    assert result.triaged == [{"rule": "image-alt", "reason": "error", "reverted": True}]
+    assert result.unreverted == []
+    assert result.tree_modified is False
+    assert [e["step"] for e in result.dropped_audit] == ["error"]
+    assert [p.new for p in result.verified] == ['  <img src="logo.png" alt="Logo">']
+    lines = (tmp_path / "index.html").read_text().splitlines()
+    assert lines[2] == '  <img src="hero.png">', "the patch was reverted, not stranded"
