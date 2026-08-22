@@ -25,7 +25,7 @@ dependencies = [
 dev = ["pytest>=8.0.0", "pytest-asyncio>=0.23.0", "httpx2>=2.0.0", "requests>=2.32.0"]
 
 [tool.setuptools.packages.find]
-include = ["substrate*", "app*"]
+include = ["substrate*", "app*", "job*"]
 
 [tool.substrate]
 # The Python the container is built on. Declared here so there is one place to
