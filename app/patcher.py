@@ -7,6 +7,19 @@ from app.scanner import Violation
 from substrate.telemetry import log_event, span
 
 
+# Everything str.splitlines() treats as a line break. app/applier.py splits the
+# file with splitlines() and rejoins with "\n", so a replacement containing any
+# of these grows the file by a line: apply succeeds, and revert then finds
+# lines[index] != patch.new and cannot restore the file. A rejected patch would
+# stay on disk and get swept into the PR by `git commit -am`. One line in, one
+# line out is the constraint that keeps every patch reversible.
+LINE_BREAKS = "\n\r\v\f\x1c\x1d\x1e\x85\u2028\u2029"
+
+
+def contains_line_break(text: str) -> bool:
+    return any(char in text for char in LINE_BREAKS)
+
+
 class MalformedPatchError(ValueError):
     """The model returned something that is not a usable patch."""
 
@@ -56,6 +69,9 @@ def propose_patch(model, violation: Violation, match: SourceMatch, screenshot: b
         return None
     if payload["new"] == payload["old"]:
         log_event("patch.malformed", severity="WARNING", rule=violation.rule, reason="noop")
+        return None
+    if contains_line_break(payload["new"]):
+        log_event("patch.malformed", severity="WARNING", rule=violation.rule, reason="multiline")
         return None
 
     return Patch(

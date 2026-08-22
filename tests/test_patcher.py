@@ -66,3 +66,21 @@ def test_returns_none_when_patch_is_a_noop():
 def test_strips_markdown_fences_around_json():
     fenced = "```json\n" + _reply() + "\n```"
     assert propose_patch(FakeModel([fenced]), VIOLATION, MATCH, b"p") is not None
+
+
+def test_returns_none_when_replacement_spans_two_lines():
+    """The canonical `label` fix is to add a <label> element, and a model that
+    writes it on its own line produces a patch app/applier.py cannot revert:
+    the file grows a line, revert finds a mismatch, and the rejected edit stays
+    on disk for `git commit -am` to sweep into the PR."""
+    reply = _reply(
+        new='  <label for="notify">Email</label>\n  <input type="email" id="notify">'
+    )
+    assert propose_patch(FakeModel([reply]), VIOLATION, MATCH, b"p") is None
+
+
+def test_returns_none_for_exotic_line_separators():
+    """str.splitlines() splits on more than \\n, and app/applier.py uses it."""
+    for separator in ("\r", "\u2028", "\x0b", "\x85"):
+        reply = _reply(new=f'  <img src="logo.png">{separator}  <p>x</p>')
+        assert propose_patch(FakeModel([reply]), VIOLATION, MATCH, b"p") is None, separator

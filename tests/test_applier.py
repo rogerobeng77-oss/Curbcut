@@ -52,3 +52,20 @@ def test_apply_then_revert_is_byte_identical(tmp_path: Path):
     apply_patch(PATCH, str(tmp_path))
     revert_patch(PATCH, str(tmp_path))
     assert (tmp_path / "index.html").read_bytes() == before
+
+
+def test_apply_refuses_a_multiline_replacement(tmp_path: Path):
+    """Defence in depth: Patch is a plain dataclass, so a multi-line `new` can
+    reach apply_patch without going through propose_patch. Applying it would
+    make the file unrevertable, so it must not touch the file at all."""
+    _seed(tmp_path)
+    before = (tmp_path / "index.html").read_bytes()
+    multiline = Patch(
+        path="index.html",
+        line=2,
+        old='  <img src="logo.png">',
+        new='  <label for="a">A</label>\n  <img src="logo.png" alt="Logo">',
+        rationale="two lines",
+    )
+    assert apply_patch(multiline, str(tmp_path)) is False
+    assert (tmp_path / "index.html").read_bytes() == before
