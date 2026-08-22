@@ -58,6 +58,10 @@ def test_verified_patch_is_kept(tmp_path):
     assert len(result.verified) == 1
     assert result.triaged == []
     assert result.safe_to_ship
+    # A telemetry call that cannot serialise its fields shows up here and
+    # nowhere else, because _log absorbs it.
+    assert result.dropped_logs == []
+    assert result.audit_complete
 
 
 def test_unresolved_patch_is_reverted_and_triaged(tmp_path):
@@ -737,3 +741,31 @@ def test_an_audit_failure_on_the_error_step_still_reverts_the_patch(tmp_path):
     assert [p.new for p in result.verified] == ['  <img src="logo.png" alt="Logo">']
     lines = (tmp_path / "index.html").read_text().splitlines()
     assert lines[2] == '  <img src="hero.png">', "the patch was reverted, not stranded"
+
+
+def test_a_logging_failure_cannot_destroy_the_run(tmp_path, monkeypatch):
+    """log_event prints to stdout, which this process does not own: a closed or
+    broken stream raises. It sat unguarded on every recovery path, so a broken
+    pipe propagated out of run_remediation exactly like the audit write did --
+    a run destroyed by the *report* of a handled failure."""
+    root = _setup_two(tmp_path)
+
+    def broken_pipe(*args, **kwargs):
+        raise OSError(32, "Broken pipe")
+
+    monkeypatch.setattr("app.runner.log_event", broken_pipe)
+    result = run_remediation(
+        FakeModel([LOGO_FIX, HERO_FIX]), _store(), "run-broken-stdout", root, "http://x",
+        scan=_scans([VIOLATION, HERO], [HERO]),
+        verifier=_boom_on_hero,
+    )
+
+    assert [p.new for p in result.verified] == ['  <img src="logo.png" alt="Logo">']
+    assert result.triaged == [{"rule": "image-alt", "reason": "error", "reverted": True}]
+    assert result.safe_to_ship
+    assert [line.split(":")[0] for line in result.dropped_logs] == [
+        "run.violation_failed",
+        "run.patch_rejected",
+    ]
+    lines = (tmp_path / "index.html").read_text().splitlines()
+    assert lines[2] == '  <img src="hero.png">', "the failed violation's patch must be undone"

@@ -18,6 +18,7 @@ class RunResult:
     reappeared: list[dict] = field(default_factory=list)
     unreverted: list[dict] = field(default_factory=list)
     dropped_audit: list[dict] = field(default_factory=list)
+    dropped_logs: list[str] = field(default_factory=list)
 
     @property
     def tree_modified(self) -> bool:
@@ -67,6 +68,26 @@ class RunResult:
         return self.final_scan_ok and not self.reappeared and not self.unreverted
 
 
+def _log(result: RunResult, event: str, severity: str = "INFO", **fields) -> None:
+    """Emit one structured log line, without letting a logging failure escape.
+
+    Same rule as the audit write, for the same reason: these calls sit on the
+    recovery paths, and destroying a run over a *report* of a handled failure
+    is the exact shape this module is meant not to have. ``log_event`` prints
+    to stdout, which this process does not own -- a closed or broken stream
+    raises, as does ``json.dumps`` on a field nothing here should be passing.
+
+    The failure is recorded on the RunResult rather than logged, because the
+    log is what just failed. ``dropped_logs`` staying empty is worth asserting
+    in a happy-path test: a serialisation bug in a telemetry call shows up
+    there and nowhere else.
+    """
+    try:
+        log_event(event, severity=severity, **fields)
+    except Exception as exc:  # noqa: BLE001 - see the docstring
+        result.dropped_logs.append(f"{event}: {type(exc).__name__}: {exc}")
+
+
 def _audit(store: Store, run_id: str, entry: dict, result: RunResult) -> None:
     """Append one audit entry, without letting a store failure escape.
 
@@ -87,10 +108,10 @@ def _audit(store: Store, run_id: str, entry: dict, result: RunResult) -> None:
         store.append_audit(run_id, entry)
     except Exception as exc:  # noqa: BLE001 - an audit write must not kill a run
         # Recorded before it is logged: the RunResult is the copy the caller
-        # acts on, and log_event writes to stdout, which is not this process's
-        # to guarantee.
+        # acts on, and the log line is best effort.
         result.dropped_audit.append(dict(entry, error=f"{type(exc).__name__}: {exc}"))
-        log_event(
+        _log(
+            result,
             "run.audit_write_failed",
             severity="ERROR",
             step=str(entry.get("step")),
@@ -109,8 +130,8 @@ def _revert(patch: Patch, root: str, rule: str, result: RunResult) -> bool:
     except Exception as exc:  # noqa: BLE001 - see the docstring
         reverted = False
         error = f"{type(exc).__name__}: {exc}"
-        log_event(
-            "run.revert_raised", severity="ERROR", rule=rule, path=patch.path, error=error
+        _log(
+            result, "run.revert_raised", severity="ERROR", rule=rule, path=patch.path, error=error
         )
     if not reverted:
         entry = {"rule": rule, "path": patch.path, "line": patch.line, "new": patch.new}
@@ -147,7 +168,8 @@ def _reject(
         result,
     )
     result.triaged.append({"rule": violation.rule, "reason": reason, "reverted": reverted})
-    log_event(
+    _log(
+        result,
         "run.patch_rejected",
         severity=severity if reverted else "ERROR",
         rule=violation.rule,
@@ -180,7 +202,8 @@ def _recover(
             {"step": "error", "rule": violation.rule, "error": type(exc).__name__},
             result,
         )
-        log_event(
+        _log(
+            result,
             "run.violation_failed",
             severity="ERROR",
             rule=violation.rule,
@@ -202,7 +225,8 @@ def _recover(
                     "error": f"recovery_failed: {type(inner).__name__}: {inner}",
                 }
             )
-        log_event(
+        _log(
+            result,
             "run.recovery_failed",
             severity="ERROR",
             rule=violation.rule,
@@ -255,7 +279,8 @@ def _grade(
                 "expected": max(expected[(rule, selector)], 0),
             }
         )
-        log_event("run.final_scan_regression", severity="WARNING", rule=rule, selector=selector)
+        _log(result, "run.final_scan_regression", severity="WARNING", rule=rule,
+             selector=selector)
 
     for violation, patch in fixed:
         if identity(violation) in over:
@@ -293,7 +318,8 @@ def _final_gate(
     try:
         final, _ = scan(url)
     except Exception as exc:  # noqa: BLE001 - any scan failure means no verdict
-        log_event("run.final_scan_failed", severity="ERROR", error=f"{type(exc).__name__}: {exc}")
+        _log(result, "run.final_scan_failed", severity="ERROR",
+             error=f"{type(exc).__name__}: {exc}")
         _audit(store, run_id, {"step": "final_scan", "ok": False}, result)
         for violation, patch in fixed:
             _reject(
@@ -319,7 +345,8 @@ def _final_gate(
         # Candidates the loop never reached are still applied on disk and are
         # not in `verified`, which is exactly what `unreverted` means.
         result.final_scan_ok = False
-        log_event("run.final_gate_failed", severity="ERROR", error=f"{type(exc).__name__}: {exc}")
+        _log(result, "run.final_gate_failed", severity="ERROR",
+             error=f"{type(exc).__name__}: {exc}")
         _audit(store, run_id, {"step": "final_gate", "ok": False}, result)
         graded = {id(patch) for patch in result.verified}
         for violation, patch in fixed:
@@ -344,8 +371,11 @@ def run_remediation(
     scan=scan_page,
     verifier=verify,
 ) -> RunResult:
-    """Always returns a RunResult once the baseline scan is in, whatever the
-    loop or the gate hit on the way.
+    """Returns a RunResult once the baseline scan is in, whatever the loop or
+    the gate hit on the way: a raising verifier, model, locator, re-scan, audit
+    write, revert, or log line. Everything past the baseline runs inside a
+    guard, and each guard's own moving parts (``_audit``, ``_revert``, ``_log``)
+    absorb their faults rather than handing them back to it.
 
     The baseline scan itself is the one call left to propagate: it runs before
     anything is applied, so a failure there loses no work and produces no
