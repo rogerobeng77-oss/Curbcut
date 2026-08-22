@@ -73,6 +73,16 @@ def build_run_record(
     original brief -- ruling 3 (batch A4): a run that left the tree modified
     or an incomplete audit trail must say so where a human sees it, and the
     console is the only place a human looks at a run after the fact.
+
+    ``verified_patches`` and ``triaged_items`` are the detail behind the two
+    summary counts (``fixed``, ``triaged``) below -- the console's
+    verification ledger is one row per violation, and a count alone cannot
+    render a row. Nothing here changes what ``run_remediation`` decided;
+    ``result.verified`` (a list of ``app.patcher.Patch``) and
+    ``result.triaged`` (a list of plain dicts) already carry this, this just
+    serialises the same objects the PR body already renders
+    (app/github_io.py::_body) into the record the console reads instead of
+    only their length.
     """
     return {
         "id": run_id,
@@ -88,6 +98,18 @@ def build_run_record(
         "unreverted": len(result.unreverted),
         "dropped_audit": len(result.dropped_audit),
         "triaged": len(result.triaged),
+        "verified_patches": [
+            {
+                "rule": patch.rule,
+                "path": patch.path,
+                "line": patch.line,
+                "old": patch.old,
+                "new": patch.new,
+                "rationale": patch.rationale,
+            }
+            for patch in result.verified
+        ],
+        "triaged_items": list(result.triaged),
     }
 
 

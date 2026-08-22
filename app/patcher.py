@@ -33,6 +33,12 @@ class Patch:
     old: str
     new: str
     rationale: str
+    # Defaulted, not threaded through every existing call site: the axe rule
+    # this patch targets, carried only so the console can label a verified
+    # fix the same way it labels a triaged one (see job/worker.py's
+    # build_run_record). propose_patch is the one caller that knows the
+    # violation, so it is the one caller that sets this.
+    rule: str = ""
 
 
 def _strip_fences(text: str) -> str:
@@ -82,4 +88,5 @@ def propose_patch(model, violation: Violation, match: SourceMatch, screenshot: b
         old=payload["old"],
         new=payload["new"],
         rationale=payload["rationale"],
+        rule=violation.rule,
     )

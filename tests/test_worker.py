@@ -2,6 +2,7 @@ import subprocess
 
 import pytest
 
+from app.patcher import Patch
 from app.runner import RunResult
 from job.worker import _redact, _run_git, build_run_record, run_id_for, unsafe_reasons
 
@@ -51,8 +52,14 @@ def test_run_id_joins_repo_and_pr_number():
 
 
 def test_run_record_carries_the_runresult_fields_the_console_needs():
+    patches = [
+        Patch(path="index.html", line=2, old="<img>", new='<img alt="Logo">',
+              rationale="added alt", rule="image-alt"),
+        Patch(path="index.html", line=9, old="<button></button>", new='<button>Close</button>',
+              rationale="added label", rule="button-name"),
+    ]
     result = _result()
-    result.verified = ["patch-1", "patch-2"]
+    result.verified = patches
     record = build_run_record(
         "acme_site-42", {"repo": "acme/site", "pr": 42}, result, status="complete", pr_url="https://x"
     )
@@ -70,6 +77,18 @@ def test_run_record_carries_the_runresult_fields_the_console_needs():
         "unreverted": 0,
         "dropped_audit": 0,
         "triaged": 0,
+        "verified_patches": [
+            {
+                "rule": "image-alt", "path": "index.html", "line": 2,
+                "old": "<img>", "new": '<img alt="Logo">', "rationale": "added alt",
+            },
+            {
+                "rule": "button-name", "path": "index.html", "line": 9,
+                "old": "<button></button>", "new": "<button>Close</button>",
+                "rationale": "added label",
+            },
+        ],
+        "triaged_items": [],
     }
 
 
