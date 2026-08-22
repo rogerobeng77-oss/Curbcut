@@ -240,8 +240,16 @@ def main() -> None:
 
         if result.verified:
             _run_git(["git", "-C", workdir, "checkout", "-b", branch], token)
+            # -c user.name / user.email: the container has no ~/.gitconfig and
+            # `git clone` does not set one either -- verified live, the commit
+            # failed with git's own "Please tell me who you are" (exit 128)
+            # before this was added. Scoped to this one command, like the
+            # auth header, rather than a global config write this job's
+            # container does not own.
             _run_git(
-                ["git", "-C", workdir, "commit", "-am",
+                ["git", "-C", workdir,
+                 "-c", "user.name=a11y-agent", "-c", "user.email=a11y-agent@users.noreply.github.com",
+                 "commit", "-am",
                  f"fix: {len(result.verified)} verified accessibility violation(s)"],
                 token,
             )
