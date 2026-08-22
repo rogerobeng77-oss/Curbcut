@@ -238,32 +238,50 @@ def main() -> None:
             store.put("runs", run_id, build_run_record(run_id, args, result, status="unsafe"))
             return
 
-        if result.verified:
-            _run_git(["git", "-C", workdir, "checkout", "-b", branch], token)
-            # -c user.name / user.email: the container has no ~/.gitconfig and
-            # `git clone` does not set one either -- verified live, the commit
-            # failed with git's own "Please tell me who you are" (exit 128)
-            # before this was added. Scoped to this one command, like the
-            # auth header, rather than a global config write this job's
-            # container does not own.
-            _run_git(
-                ["git", "-C", workdir,
-                 "-c", "user.name=a11y-agent", "-c", "user.email=a11y-agent@users.noreply.github.com",
-                 "commit", "-am",
-                 f"fix: {len(result.verified)} verified accessibility violation(s)"],
-                token,
-            )
-            _run_git(
-                ["git", "-C", workdir, "-c", f"http.extraheader={auth_header}",
-                 "push", "origin", f"HEAD:refs/heads/{branch}"],
-                token,
-            )
+        try:
+            if result.verified:
+                _run_git(["git", "-C", workdir, "checkout", "-b", branch], token)
+                # -c user.name / user.email: the container has no ~/.gitconfig
+                # and `git clone` does not set one either -- verified live,
+                # the commit failed with git's own "Please tell me who you
+                # are" (exit 128) before this was added. Scoped to this one
+                # command, like the auth header, rather than a global config
+                # write this job's container does not own.
+                _run_git(
+                    ["git", "-C", workdir,
+                     "-c", "user.name=a11y-agent",
+                     "-c", "user.email=a11y-agent@users.noreply.github.com",
+                     "commit", "-am",
+                     f"fix: {len(result.verified)} verified accessibility violation(s)"],
+                    token,
+                )
+                _run_git(
+                    ["git", "-C", workdir, "-c", f"http.extraheader={auth_header}",
+                     "push", "origin", f"HEAD:refs/heads/{branch}"],
+                    token,
+                )
 
-        ref = PullRequestRef(args["repo"], args["pr"], args["head_ref"], args["head_sha"])
-        pr_url = open_fix_pr(
-            _github_client(token), ref, result.verified, result.triaged,
-            screenshots={}, dropped_audit=result.dropped_audit,
-        )
+            ref = PullRequestRef(args["repo"], args["pr"], args["head_ref"], args["head_sha"])
+            pr_url = open_fix_pr(
+                _github_client(token), ref, result.verified, result.triaged,
+                screenshots={}, dropped_audit=result.dropped_audit,
+            )
+        except Exception as exc:  # noqa: BLE001 - see the docstring below
+            # A run whose patches were verified and safe to ship but which
+            # then failed to commit, push, or open the PR must not sit at
+            # "running" forever -- verified live: an uncaught exception here
+            # (before this guard existed) crashed the process without ever
+            # writing a terminal status, and the console had no way to show
+            # anything but a run that looked eternally in progress. The
+            # remediation itself is still reported honestly (verified/
+            # triaged counts, safe_to_ship, …) via build_run_record; only the
+            # publish step failed.
+            log_event(
+                "run.publish_failed", severity="ERROR", run_id=run_id,
+                repo=args["repo"], pr=args["pr"], error=_redact(f"{type(exc).__name__}: {exc}", token),
+            )
+            store.put("runs", run_id, build_run_record(run_id, args, result, status="failed"))
+            raise
 
     store.put(
         "runs", run_id,
