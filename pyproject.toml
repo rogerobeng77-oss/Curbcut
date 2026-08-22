@@ -1,0 +1,33 @@
+[project]
+name = "a11y-agent"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "google-adk>=2.7.1",
+    "google-genai>=2.19.0",
+    "google-cloud-firestore>=2.16.0",
+    "google-cloud-pubsub>=2.21.0",
+    "google-cloud-run>=0.10.0",
+    "opentelemetry-sdk>=1.25.0",
+    "opentelemetry-exporter-gcp-trace>=1.6.0",
+    "fastapi>=0.111.0",
+    "uvicorn>=0.30.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0", "pytest-asyncio>=0.23.0", "httpx2>=2.0.0", "requests>=2.32.0"]
+
+[tool.substrate]
+# The Python the container is built on. Declared here so there is one place to
+# change it, next to requires-python: that is the *support floor* (what the
+# library must import under), this is the *deploy target* (what production
+# actually runs). They are different facts and were previously conflated.
+#
+# Not a .python-version file: uv and pyenv act on that one, so it would rewrite
+# developers' venvs as a side effect of stating a deploy intention. Not derived
+# from the local interpreter either -- the 3.11 venv is whichever Python uv
+# happened to find, and there is no CI pinning it.
+deploy-python = "3.13"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
