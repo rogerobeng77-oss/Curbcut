@@ -112,3 +112,11 @@ def test_run_git_scrubs_the_token_from_a_failed_command():
 
 def test_run_git_succeeds_silently_for_a_zero_exit():
     _run_git(["python3", "-c", "pass"], "sekrit-value")
+
+
+def test_git_auth_header_is_basic_auth_with_x_access_token_username():
+    from job.worker import _git_auth_header
+
+    assert _git_auth_header("sekrit-value") == (
+        "Authorization: Basic eC1hY2Nlc3MtdG9rZW46c2Vrcml0LXZhbHVl"
+    )

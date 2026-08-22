@@ -95,6 +95,23 @@ def _redact(text: str, secret: str) -> str:
     return text.replace(secret, "[REDACTED]") if secret else text
 
 
+def _git_auth_header(token: str) -> str:
+    """The `http.extraheader` value that authenticates a git-over-HTTPS
+    request against GitHub with `token`.
+
+    Verified live, the hard way: `Authorization: Bearer <token>` -- valid
+    for GitHub's REST API with this exact token (`GET /user` returned 200)
+    -- is rejected by GitHub's git-over-HTTPS smart endpoint with `remote:
+    invalid credentials`. HTTP Basic auth with a conventional placeholder
+    username (`x-access-token`) and the token as the password is what
+    GitHub's own git integration guides document, and is what actually
+    worked in the same reproduction.
+    """
+    import base64
+
+    return "Authorization: Basic " + base64.b64encode(f"x-access-token:{token}".encode()).decode()
+
+
 def _run_git(args: list[str], token: str) -> None:
     """subprocess.run(args, check=True), with the GitHub token scrubbed from
     whatever this raises.
@@ -180,7 +197,7 @@ def main() -> None:
     # -- git failed with "could not read Username" against a header that
     # *looked* well-formed in the source.
     token = os.environ["GITHUB_TOKEN"].strip()
-    auth_header = f"Authorization: Bearer {token}"
+    auth_header = _git_auth_header(token)
     branch = f"a11y-fixes/{args['head_sha'][:7]}"
 
     with tempfile.TemporaryDirectory() as workdir:
