@@ -285,3 +285,131 @@ def test_unsupported_rule_is_triaged_and_never_patched(tmp_path):
     assert result.verified == []
     assert result.triaged == [{"rule": "heading-order", "reason": "unsupported_rule"}]
     assert result.safe_to_ship
+
+
+# --- Findings 3 and 4: revert visibility, and errors that stay local -------
+
+HERO = Violation(
+    rule="image-alt",
+    selector=".hero",
+    html='<img src="hero.png">',
+    impact="critical",
+    description="Images must have alternate text",
+)
+HERO_FIX = _reply('  <img src="hero.png">', '  <img src="hero.png" alt="Hero">')
+LOGO_FIX = _reply('  <img src="logo.png">', '  <img src="logo.png" alt="Logo">')
+
+
+def _setup_two(tmp_path):
+    (tmp_path / "index.html").write_text(
+        '<div>\n  <img src="logo.png">\n  <img src="hero.png">\n</div>\n'
+    )
+    return str(tmp_path)
+
+
+def test_failed_revert_is_reported_to_the_caller(tmp_path, monkeypatch):
+    """A rejected patch whose revert fails leaves the file modified. The caller
+    builds a PR from that working tree, so it has to be told."""
+    root = _setup(tmp_path)
+    monkeypatch.setattr("app.runner.revert_patch", lambda patch, root: False)
+    store = _store()
+    model = FakeModel([LOGO_FIX])
+    result = run_remediation(
+        model, store, "run-dirty", root, "http://x",
+        scan=_scans([VIOLATION], []),
+        verifier=lambda url, target, baseline, scan=None: Verdict.UNRESOLVED,
+    )
+    assert result.triaged[0]["reverted"] is False
+    assert result.tree_modified is True
+    assert not result.safe_to_ship
+    assert result.unreverted[0]["rule"] == "image-alt"
+    revert_steps = [
+        {k: v for k, v in e.items() if k != "seq"}
+        for e in store.audit_trail("run-dirty")
+        if e["step"] == "revert"
+    ]
+    assert revert_steps == [
+        {"step": "revert", "rule": "image-alt", "reason": "unresolved", "reverted": False}
+    ]
+
+
+def test_successful_revert_is_recorded_too(tmp_path):
+    root = _setup(tmp_path)
+    store = _store()
+    result = run_remediation(
+        FakeModel([LOGO_FIX]), store, "run-clean", root, "http://x",
+        scan=_scans([VIOLATION], []),
+        verifier=lambda url, target, baseline, scan=None: Verdict.REGRESSED,
+    )
+    assert result.triaged[0]["reverted"] is True
+    assert result.tree_modified is False
+    assert [e["step"] for e in store.audit_trail("run-clean")][-2:] == ["revert", "final_scan"]
+
+
+def test_raising_verifier_does_not_abort_the_run(tmp_path):
+    """A Playwright timeout inside verify used to propagate: the caller got an
+    exception instead of a RunResult, every earlier patch was discarded and the
+    last one stayed on disk."""
+    root = _setup_two(tmp_path)
+
+    def verifier(url, target, baseline, scan=None):
+        if target.selector == ".logo":
+            raise TimeoutError("playwright: page.goto timeout 30000ms exceeded")
+        return Verdict.RESOLVED
+
+    result = run_remediation(
+        FakeModel([LOGO_FIX, HERO_FIX]), _store(), "run-boom-verify", root, "http://x",
+        scan=_scans([VIOLATION, HERO], [VIOLATION]),
+        verifier=verifier,
+    )
+    assert [t["reason"] for t in result.triaged] == ["error"]
+    assert result.triaged[0]["reverted"] is True
+    assert [p.new for p in result.verified] == ['  <img src="hero.png" alt="Hero">']
+    assert result.safe_to_ship
+    lines = (tmp_path / "index.html").read_text().splitlines()
+    assert lines[1] == '  <img src="logo.png">', "the failed violation's patch must be undone"
+
+
+def test_raising_model_does_not_abort_the_run(tmp_path):
+    """Same for a model that throws -- a 429 mid-run costs one violation, not
+    the whole run."""
+    root = _setup_two(tmp_path)
+
+    class Throttled:
+        def __init__(self):
+            self.calls = 0
+
+        def generate(self, prompt, images=None):
+            self.calls += 1
+            if self.calls == 1:
+                raise RuntimeError("vertex 429 RESOURCE_EXHAUSTED")
+            return HERO_FIX
+
+    result = run_remediation(
+        Throttled(), _store(), "run-boom-model", root, "http://x",
+        scan=_scans([VIOLATION, HERO], [VIOLATION]),
+        verifier=lambda url, target, baseline, scan=None: Verdict.RESOLVED,
+    )
+    assert result.triaged == [{"rule": "image-alt", "reason": "error"}]
+    assert [p.new for p in result.verified] == ['  <img src="hero.png" alt="Hero">']
+    assert result.tree_modified is False
+
+
+def test_error_is_written_to_the_audit_trail(tmp_path):
+    root = _setup(tmp_path)
+    store = _store()
+
+    def verifier(url, target, baseline, scan=None):
+        raise TimeoutError("boom")
+
+    run_remediation(
+        FakeModel([LOGO_FIX]), store, "run-audit-err", root, "http://x",
+        scan=_scans([VIOLATION], []),
+        verifier=verifier,
+    )
+    errors = [
+        {k: v for k, v in e.items() if k != "seq"}
+        for e in store.audit_trail("run-audit-err")
+        if e["step"] == "error"
+    ]
+    assert errors == [{"step": "error", "rule": "image-alt", "error": "TimeoutError"}]

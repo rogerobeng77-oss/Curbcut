@@ -20,21 +20,21 @@ class RunResult:
 
     @property
     def tree_modified(self) -> bool:
-        """True when a revert attempt returned False. The run changed a file
+        """True when a revert attempt returned False: this run changed a file
         and could not put it back, so the working tree carries an edit that is
-        not in ``verified`` -- anything building a PR from the tree is about to
-        commit it."""
+        not in ``verified``. A caller running `git commit -am` would ship it."""
         return bool(self.unreverted)
 
     @property
     def safe_to_ship(self) -> bool:
         """True only when the final whole-page re-scan ran, found nothing above
-        the baseline, and every revert succeeded.
+        the baseline, and every revert this run attempted succeeded.
 
-        ``reappeared`` covers both a target that came back and an unattributable
-        new violation; either way the final snapshot no longer describes a tree
-        that only contains confirmed fixes, and a drop at the gate changes the
-        tree again after that snapshot was taken."""
+        ``reappeared`` covers both a target that came back and a new violation
+        nobody attributed to a patch; either way the page is worse than the
+        gate's snapshot describes, because dropping a patch at the gate edits
+        the tree again after that snapshot was taken.
+        """
         return self.final_scan_ok and not self.reappeared and not self.unreverted
 
 
@@ -45,6 +45,35 @@ def _revert(patch: Patch, root: str, rule: str, result: RunResult) -> bool:
             {"rule": rule, "path": patch.path, "line": patch.line, "new": patch.new}
         )
     return reverted
+
+
+def _reject(
+    patch: Patch,
+    violation: Violation,
+    reason: str,
+    result: RunResult,
+    root: str,
+    store: Store,
+    run_id: str,
+    severity: str = "INFO",
+) -> None:
+    """Undo a patch that will not be returned, and say out loud whether the undo
+    worked. ``reverted=False`` means the file is still modified: the triage
+    entry, the audit trail and ``RunResult.tree_modified`` all carry that,
+    because a caller building a PR from the working tree cannot see it
+    otherwise."""
+    reverted = _revert(patch, root, violation.rule, result)
+    store.append_audit(
+        run_id, {"step": "revert", "rule": violation.rule, "reason": reason, "reverted": reverted}
+    )
+    result.triaged.append({"rule": violation.rule, "reason": reason, "reverted": reverted})
+    log_event(
+        "run.patch_rejected",
+        severity=severity if reverted else "ERROR",
+        rule=violation.rule,
+        verdict=reason,
+        reverted=reverted,
+    )
 
 
 def _final_gate(
@@ -61,33 +90,30 @@ def _final_gate(
     patch into ``result.verified``.
 
     Per-violation ``verify`` cannot answer the two questions this does: whether
-    a later patch un-did an earlier verified fix (its baseline is frozen, so a
-    returning violation is still "known"), and whether two patches on the same
-    source line both survived. If this scan cannot run, nothing is returned as
-    verified -- an unverifiable run produces no output rather than output the
-    run cannot vouch for.
+    a later patch un-did an earlier verified fix (``verify``'s baseline is
+    frozen, so a violation that comes back is still "known" and never counts as
+    introduced), and whether two patches that rewrote the same source line both
+    survived. If this scan cannot run, nothing is returned as verified: an
+    unverifiable run produces no output rather than output it cannot vouch for.
     """
     try:
         final, _ = scan(url)
-    except Exception as exc:  # noqa: BLE001 - deliberately broad, see docstring
-        log_event("run.final_scan_failed", severity="ERROR", error=repr(exc))
+    except Exception as exc:  # noqa: BLE001 - any scan failure means no verdict
+        log_event("run.final_scan_failed", severity="ERROR", error=f"{type(exc).__name__}: {exc}")
         store.append_audit(run_id, {"step": "final_scan", "ok": False})
         for violation, patch in fixed:
-            reverted = _revert(patch, root, violation.rule, result)
-            store.append_audit(
-                run_id, {"step": "revert", "rule": violation.rule, "reverted": reverted}
-            )
-            result.triaged.append(
-                {"rule": violation.rule, "reason": "final_scan_failed", "reverted": reverted}
+            _reject(
+                patch, violation, "final_scan_failed", result, root, store, run_id, "ERROR"
             )
         return
 
     result.final_scan_ok = True
     store.append_audit(run_id, {"step": "final_scan", "ok": True, "found": len(final)})
 
-    # Counts, not sets: a rule+selector the baseline already had can legitimately
+    # Counts, not sets: a rule+selector pair the baseline already carried can
     # appear once in the final scan and still be one *more* than this run should
-    # have left behind.
+    # have left behind -- either the fixed one came back, or a second node now
+    # has the same identity. A set comparison sees neither.
     expected = Counter(identity(v) for v in baseline)
     for violation, _patch in fixed:
         expected[identity(violation)] -= 1
@@ -106,23 +132,12 @@ def _final_gate(
         log_event("run.final_scan_regression", severity="WARNING", rule=rule, selector=selector)
 
     for violation, patch in fixed:
-        if identity(violation) not in over:
+        if identity(violation) in over:
+            _reject(
+                patch, violation, "final_scan_unresolved", result, root, store, run_id, "WARNING"
+            )
+        else:
             result.verified.append(patch)
-            continue
-        reverted = _revert(patch, root, violation.rule, result)
-        store.append_audit(
-            run_id, {"step": "revert", "rule": violation.rule, "reverted": reverted}
-        )
-        result.triaged.append(
-            {"rule": violation.rule, "reason": "final_scan_unresolved", "reverted": reverted}
-        )
-        log_event(
-            "run.patch_rejected",
-            severity="WARNING",
-            rule=violation.rule,
-            verdict="final_scan_unresolved",
-            reverted=reverted,
-        )
 
 
 def run_remediation(
@@ -147,51 +162,69 @@ def run_remediation(
                 result.triaged.append({"rule": violation.rule, "reason": "unsupported_rule"})
                 continue
 
-            match = locate(violation, root)
-            store.append_audit(
-                run_id,
-                {"step": "locate", "rule": violation.rule, "found": match is not None},
-            )
-            if match is None:
-                result.triaged.append({"rule": violation.rule, "reason": "not_located"})
-                continue
-
-            patch = propose_patch(model, violation, match, screenshot)
-            store.append_audit(
-                run_id,
-                {"step": "propose", "rule": violation.rule, "proposed": patch is not None},
-            )
-            if patch is None:
-                result.triaged.append({"rule": violation.rule, "reason": "no_patch"})
-                continue
-
-            applied = apply_patch(patch, root)
-            store.append_audit(run_id, {"step": "apply", "rule": violation.rule, "ok": applied})
-            if not applied:
-                result.triaged.append({"rule": violation.rule, "reason": "apply_failed"})
-                continue
-
-            # A RESOLVED verdict here only makes the patch a *candidate*: it says
-            # this patch's target was gone at this moment, against a baseline
-            # frozen before the run. Nothing reaches result.verified until
-            # _final_gate re-scans the finished page.
-            verdict = verifier(url, violation, baseline, scan=scan)
-            store.append_audit(
-                run_id, {"step": "verify", "rule": violation.rule, "verdict": verdict.value}
-            )
-
-            if verdict is Verdict.RESOLVED:
-                fixed.append((violation, patch))
-            else:
-                reverted = _revert(patch, root, violation.rule, result)
-                result.triaged.append({"rule": violation.rule, "reason": verdict.value})
-                log_event(
-                    "run.patch_rejected",
-                    severity="INFO" if reverted else "ERROR",
-                    rule=violation.rule,
-                    verdict=verdict.value,
-                    reverted=reverted,
+            # One violation blowing up must not cost the run every patch already
+            # verified, and must never leave its own patch on disk. A raising
+            # verifier (Playwright timeout) and a raising model (vertex 429
+            # RESOURCE_EXHAUSTED) are the two likeliest live failures; both land
+            # in the handler below.
+            applied: Patch | None = None
+            try:
+                match = locate(violation, root)
+                store.append_audit(
+                    run_id,
+                    {"step": "locate", "rule": violation.rule, "found": match is not None},
                 )
+                if match is None:
+                    result.triaged.append({"rule": violation.rule, "reason": "not_located"})
+                    continue
+
+                patch = propose_patch(model, violation, match, screenshot)
+                store.append_audit(
+                    run_id,
+                    {"step": "propose", "rule": violation.rule, "proposed": patch is not None},
+                )
+                if patch is None:
+                    result.triaged.append({"rule": violation.rule, "reason": "no_patch"})
+                    continue
+
+                ok = apply_patch(patch, root)
+                store.append_audit(run_id, {"step": "apply", "rule": violation.rule, "ok": ok})
+                if not ok:
+                    result.triaged.append({"rule": violation.rule, "reason": "apply_failed"})
+                    continue
+                applied = patch
+
+                # A RESOLVED verdict here only makes the patch a *candidate*: it
+                # says this patch's target was gone at this moment, measured
+                # against a baseline frozen before the run started. Nothing
+                # reaches result.verified until _final_gate re-scans the
+                # finished page.
+                verdict = verifier(url, violation, baseline, scan=scan)
+                store.append_audit(
+                    run_id, {"step": "verify", "rule": violation.rule, "verdict": verdict.value}
+                )
+
+                if verdict is Verdict.RESOLVED:
+                    fixed.append((violation, patch))
+                    applied = None  # left on disk on purpose, pending the gate
+                    continue
+
+                _reject(patch, violation, verdict.value, result, root, store, run_id)
+            except Exception as exc:  # noqa: BLE001 - see the comment above
+                store.append_audit(
+                    run_id,
+                    {"step": "error", "rule": violation.rule, "error": type(exc).__name__},
+                )
+                log_event(
+                    "run.violation_failed",
+                    severity="ERROR",
+                    rule=violation.rule,
+                    error=f"{type(exc).__name__}: {exc}",
+                )
+                if applied is None:
+                    result.triaged.append({"rule": violation.rule, "reason": "error"})
+                else:
+                    _reject(applied, violation, "error", result, root, store, run_id, "ERROR")
 
         _final_gate(result, fixed, baseline, url, root, scan, store, run_id)
 
