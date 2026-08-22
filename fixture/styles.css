@@ -1,0 +1,6 @@
+body { font-family: system-ui, sans-serif; background: #ffffff; color: #1a1a1a; }
+.logo { width: 120px; }
+/* 2.6:1 against white — below the 4.5:1 WCAG AA threshold */
+.muted { color: #9a9a9a; }
+.icon-btn { width: 32px; height: 32px; background: #0b5fff; border: 0; }
+.chevron { display: inline-block; width: 24px; height: 24px; background: #0b5fff; }
