@@ -1,5 +1,9 @@
+import subprocess
+
+import pytest
+
 from app.runner import RunResult
-from job.worker import build_run_record, run_id_for, unsafe_reasons
+from job.worker import _redact, _run_git, build_run_record, run_id_for, unsafe_reasons
 
 
 def _result(**overrides) -> RunResult:
@@ -81,3 +85,30 @@ def test_run_record_reports_an_unsafe_run_honestly():
     assert record["audit_complete"] is False
     assert record["dropped_audit"] == 1
     assert record["pr_url"] is None
+
+
+def test_redact_replaces_every_occurrence_of_the_secret():
+    assert _redact("token=sekrit and sekrit again", "sekrit") == (
+        "token=[REDACTED] and [REDACTED] again"
+    )
+
+
+def test_redact_is_a_noop_for_an_empty_secret():
+    assert _redact("nothing to hide", "") == "nothing to hide"
+
+
+def test_run_git_scrubs_the_token_from_a_failed_command():
+    # Verified live: an unhandled CalledProcessError from a git subprocess
+    # invoked with the token in argv (http.extraheader) printed the token in
+    # plain text to Cloud Logging via its own .cmd repr. This pins that a
+    # failure from _run_git can never carry the token in any of its fields.
+    with pytest.raises(subprocess.CalledProcessError) as excinfo:
+        _run_git(["python3", "-c", "import sys; sys.exit(1)", "--token=sekrit-value"], "sekrit-value")
+    exc = excinfo.value
+    assert "sekrit-value" not in str(exc)
+    assert "sekrit-value" not in " ".join(exc.cmd)
+    assert "[REDACTED]" in " ".join(exc.cmd)
+
+
+def test_run_git_succeeds_silently_for_a_zero_exit():
+    _run_git(["python3", "-c", "pass"], "sekrit-value")

@@ -91,6 +91,35 @@ def build_run_record(
     }
 
 
+def _redact(text: str, secret: str) -> str:
+    return text.replace(secret, "[REDACTED]") if secret else text
+
+
+def _run_git(args: list[str], token: str) -> None:
+    """subprocess.run(args, check=True), with the GitHub token scrubbed from
+    whatever this raises.
+
+    Verified live and the hard way: an unhandled `CalledProcessError` from a
+    `git clone`/`push` invoked with `-c http.extraheader=Authorization:
+    Bearer <token>` prints its own `.cmd` in the default traceback, which
+    contains that header verbatim -- and Cloud Run Jobs sends an unhandled
+    exception's traceback straight to Cloud Logging, a durable, exportable
+    sink. That happened once during this batch's own deploy testing (a
+    scratch, since-flagged-for-rotation token; see README/report). Every
+    call site that can put the token in an argv list goes through this
+    function instead of a bare `subprocess.run`.
+    """
+    try:
+        subprocess.run(args, check=True, capture_output=True, text=True)
+    except subprocess.CalledProcessError as exc:
+        raise subprocess.CalledProcessError(
+            exc.returncode,
+            [_redact(arg, token) for arg in exc.cmd],
+            output=_redact(exc.output or "", token),
+            stderr=_redact(exc.stderr or "", token),
+        ) from None
+
+
 def _wait_until_serving(url: str, timeout: float = 10.0) -> None:
     """Block until `url` answers or `timeout` elapses.
 
@@ -145,7 +174,12 @@ def main() -> None:
 
     # GITHUB_TOKEN comes from Secret Manager in Cloud Run (--set-secrets) and
     # from `gh auth token`, exported by hand, for a local run -- see README.
-    token = os.environ["GITHUB_TOKEN"]
+    # .strip(): verified live that a Secret Manager value can carry a
+    # trailing newline (however it was written into the secret), and a
+    # newline inside an HTTP header value breaks `http.extraheader` outright
+    # -- git failed with "could not read Username" against a header that
+    # *looked* well-formed in the source.
+    token = os.environ["GITHUB_TOKEN"].strip()
     auth_header = f"Authorization: Bearer {token}"
     branch = f"a11y-fixes/{args['head_sha'][:7]}"
 
@@ -156,13 +190,13 @@ def main() -> None:
         # it to these two commands. It is still visible to `ps` on this
         # container for the life of the subprocess -- accepted here because a
         # Cloud Run Job's container is single-tenant for its own execution.
-        subprocess.run(
+        _run_git(
             [
                 "git", "clone", "--depth", "1", "--branch", args["head_ref"],
                 "-c", f"http.extraheader={auth_header}",
                 f"https://github.com/{args['repo']}.git", workdir,
             ],
-            check=True,
+            token,
         )
 
         port = "8081"
@@ -188,16 +222,16 @@ def main() -> None:
             return
 
         if result.verified:
-            subprocess.run(["git", "-C", workdir, "checkout", "-b", branch], check=True)
-            subprocess.run(
+            _run_git(["git", "-C", workdir, "checkout", "-b", branch], token)
+            _run_git(
                 ["git", "-C", workdir, "commit", "-am",
                  f"fix: {len(result.verified)} verified accessibility violation(s)"],
-                check=True,
+                token,
             )
-            subprocess.run(
+            _run_git(
                 ["git", "-C", workdir, "-c", f"http.extraheader={auth_header}",
                  "push", "origin", f"HEAD:refs/heads/{branch}"],
-                check=True,
+                token,
             )
 
         ref = PullRequestRef(args["repo"], args["pr"], args["head_ref"], args["head_sha"])
@@ -223,4 +257,14 @@ def _github_client(token: str):
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as exc:  # noqa: BLE001 - see the docstring
+        # Last-resort scrub. _run_git already redacts the token from a
+        # CalledProcessError it raises, but this is defense in depth for
+        # anything else that could put the token in a message reaching the
+        # default, uncaught-exception traceback -- which Cloud Run Jobs
+        # forwards to Cloud Logging verbatim. GITHUB_TOKEN may be unset if
+        # main() failed before reading it, hence the getenv rather than []..
+        token = os.environ.get("GITHUB_TOKEN", "").strip()
+        raise RuntimeError(_redact(f"{type(exc).__name__}: {exc}", token)) from None
