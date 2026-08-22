@@ -7,6 +7,11 @@ from playwright.sync_api import sync_playwright
 
 from substrate.telemetry import span
 
+# The rules the remediation loop knows how to patch. This is a *loop* filter,
+# applied in app/runner.py -- deliberately NOT a scan filter. scan_page returns
+# every violation axe reports, because verify() and the runner's final gate
+# compare whole-page scans: filtering here would have hidden a patch that fixes
+# its target while introducing, say, heading-order or duplicate-id.
 SUPPORTED_RULES = frozenset(
     {"image-alt", "button-name", "link-name", "color-contrast", "label"}
 )
@@ -35,6 +40,7 @@ def _axe_source() -> str:
 
 
 def scan_page(url: str) -> tuple[list[Violation], bytes]:
+    """Every violation axe reports, unfiltered, plus a full-page screenshot."""
     with span("a11y.scan", url=url):
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch()
@@ -47,8 +53,6 @@ def scan_page(url: str) -> tuple[list[Violation], bytes]:
 
     violations = []
     for entry in json.loads(raw)["violations"]:
-        if entry["id"] not in SUPPORTED_RULES:
-            continue
         for node in entry["nodes"]:
             violations.append(
                 Violation(
