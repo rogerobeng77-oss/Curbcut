@@ -682,3 +682,35 @@ def test_an_unattributed_reappearance_leaves_the_tree_matching_the_scan(tmp_path
     assert not result.safe_to_ship
     lines = (tmp_path / "index.html").read_text().splitlines()
     assert lines[1] == '  <img src="logo.png" alt="Logo">', "tree is what the gate scanned"
+
+
+def test_a_recovery_arm_that_breaks_still_returns_and_flags_the_tree(tmp_path, monkeypatch):
+    """Last-resort guard on the loop's except arm. _audit and _revert absorb the
+    store and filesystem faults underneath it, so this injects a break the arm
+    does not own: whatever fails in there, the run returns, the violation is
+    triaged, and the patch left applied is reported rather than assumed clean."""
+    root = _setup_two(tmp_path)
+
+    def exploding_reject(*args, **kwargs):
+        raise RuntimeError("the rescue blew up")
+
+    monkeypatch.setattr("app.runner._reject", exploding_reject)
+    result = run_remediation(
+        FakeModel([LOGO_FIX, HERO_FIX]), _store(), "run-recovery-broken", root, "http://x",
+        scan=_scans([VIOLATION, HERO], [HERO]),
+        verifier=_boom_on_hero,
+    )
+
+    assert [p.new for p in result.verified] == ['  <img src="logo.png" alt="Logo">']
+    assert result.triaged == [{"rule": "image-alt", "reason": "recovery_failed"}]
+    assert result.unreverted == [
+        {
+            "rule": "image-alt",
+            "path": "index.html",
+            "line": 3,
+            "new": '  <img src="hero.png" alt="Hero">',
+            "error": "recovery_failed: RuntimeError: the rescue blew up",
+        }
+    ]
+    assert result.tree_modified is True
+    assert not result.safe_to_ship

@@ -67,7 +67,7 @@ class RunResult:
         return self.final_scan_ok and not self.reappeared and not self.unreverted
 
 
-def _audit(store: Store, run_id: str, entry: dict, result: RunResult) -> bool:
+def _audit(store: Store, run_id: str, entry: dict, result: RunResult) -> None:
     """Append one audit entry, without letting a store failure escape.
 
     ``Store.append_audit`` is a Firestore transaction that raises on its own
@@ -85,8 +85,10 @@ def _audit(store: Store, run_id: str, entry: dict, result: RunResult) -> bool:
     """
     try:
         store.append_audit(run_id, entry)
-        return True
     except Exception as exc:  # noqa: BLE001 - an audit write must not kill a run
+        # Recorded before it is logged: the RunResult is the copy the caller
+        # acts on, and log_event writes to stdout, which is not this process's
+        # to guarantee.
         result.dropped_audit.append(dict(entry, error=f"{type(exc).__name__}: {exc}"))
         log_event(
             "run.audit_write_failed",
@@ -94,7 +96,6 @@ def _audit(store: Store, run_id: str, entry: dict, result: RunResult) -> bool:
             step=str(entry.get("step")),
             error=f"{type(exc).__name__}: {exc}",
         )
-        return False
 
 
 def _revert(patch: Patch, root: str, rule: str, result: RunResult) -> bool:
@@ -190,12 +191,6 @@ def _recover(
         else:
             _reject(applied, violation, "error", result, root, store, run_id, "ERROR")
     except Exception as inner:  # noqa: BLE001 - the rescue itself failed
-        log_event(
-            "run.recovery_failed",
-            severity="ERROR",
-            rule=violation.rule,
-            error=f"{type(inner).__name__}: {inner}",
-        )
         result.triaged.append({"rule": violation.rule, "reason": "recovery_failed"})
         if applied is not None:
             result.unreverted.append(
@@ -207,6 +202,12 @@ def _recover(
                     "error": f"recovery_failed: {type(inner).__name__}: {inner}",
                 }
             )
+        log_event(
+            "run.recovery_failed",
+            severity="ERROR",
+            rule=violation.rule,
+            error=f"{type(inner).__name__}: {inner}",
+        )
 
 
 def _grade(
