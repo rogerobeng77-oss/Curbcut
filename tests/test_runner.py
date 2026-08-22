@@ -427,3 +427,179 @@ def test_error_is_written_to_the_audit_trail(tmp_path):
         if e["step"] == "error"
     ]
     assert errors == [{"step": "error", "rule": "image-alt", "error": "TimeoutError"}]
+
+
+# --- The recovery path itself must not raise -------------------------------
+
+
+class BlowUpStore(Store):
+    """A store whose audit write fails for one step, like a Firestore blip that
+    happens to land on a recovery-path write. ``append_audit`` raises exactly
+    what substrate/store.py documents as its retry-ceiling failure."""
+
+    def __init__(self, boom_step: str):
+        super().__init__(load_config(prefix="a11y"), client=FakeFirestore())
+        self.boom_step = boom_step
+
+    def append_audit(self, run_id, entry):
+        if entry.get("step") == self.boom_step:
+            raise ValueError("Failed to commit transaction in 5 attempts.")
+        return super().append_audit(run_id, entry)
+
+
+def _boom_on_hero(url, target, baseline, scan=None):
+    if target.selector == ".hero":
+        raise TimeoutError("playwright: page.goto timeout 30000ms exceeded")
+    return Verdict.RESOLVED
+
+
+def test_audit_failure_inside_the_reject_path_does_not_abort_the_run(tmp_path):
+    """The loop's except arm calls _reject, which writes an audit entry. That
+    write is a Firestore RPC and can raise -- and used to take the whole run
+    with it: no RunResult, the already-verified logo patch lost, the hero patch
+    left on disk."""
+    root = _setup_two(tmp_path)
+    store = BlowUpStore("revert")
+
+    result = run_remediation(
+        FakeModel([LOGO_FIX, HERO_FIX]), store, "run-reject-audit", root, "http://x",
+        scan=_scans([VIOLATION, HERO], [HERO]),
+        verifier=_boom_on_hero,
+    )
+
+    assert [p.new for p in result.verified] == ['  <img src="logo.png" alt="Logo">']
+    assert result.triaged == [{"rule": "image-alt", "reason": "error", "reverted": True}]
+    assert result.safe_to_ship
+    lines = (tmp_path / "index.html").read_text().splitlines()
+    assert lines[2] == '  <img src="hero.png">', "the failed violation's patch must be undone"
+
+
+def test_a_dropped_audit_entry_is_returned_not_silently_lost(tmp_path):
+    """The trail is what the demo renders, so an entry that could not be
+    persisted comes back on the RunResult instead of vanishing. It does not
+    make the run unshippable: the patch was verified by the final scan, and a
+    logging fault does not un-verify it."""
+    root = _setup_two(tmp_path)
+    store = BlowUpStore("revert")
+
+    result = run_remediation(
+        FakeModel([LOGO_FIX, HERO_FIX]), store, "run-dropped-audit", root, "http://x",
+        scan=_scans([VIOLATION, HERO], [HERO]),
+        verifier=_boom_on_hero,
+    )
+
+    assert result.audit_complete is False
+    assert result.dropped_audit == [
+        {
+            "step": "revert",
+            "rule": "image-alt",
+            "reason": "error",
+            "reverted": True,
+            "error": "ValueError: Failed to commit transaction in 5 attempts.",
+        }
+    ]
+    assert "revert" not in [e["step"] for e in store.audit_trail("run-dropped-audit")]
+    assert result.safe_to_ship, "a lost log line must not sink a verified run"
+
+
+def test_a_revert_that_raises_is_reported_not_propagated(tmp_path, monkeypatch):
+    """revert_patch touches the filesystem, so a read-only mount or a lost
+    permission reaches the recovery path as OSError. That must land in
+    ``unreverted`` -- the patch really is still on disk -- not abort the run."""
+    root = _setup_two(tmp_path)
+
+    def exploding_revert(patch, root_):
+        raise OSError(30, "Read-only file system")
+
+    monkeypatch.setattr("app.runner.revert_patch", exploding_revert)
+    result = run_remediation(
+        FakeModel([LOGO_FIX, HERO_FIX]), _store(), "run-revert-raise", root, "http://x",
+        scan=_scans([VIOLATION, HERO], [HERO]),
+        verifier=_boom_on_hero,
+    )
+
+    assert [p.new for p in result.verified] == ['  <img src="logo.png" alt="Logo">']
+    assert result.triaged == [{"rule": "image-alt", "reason": "error", "reverted": False}]
+    assert result.unreverted == [
+        {
+            "rule": "image-alt",
+            "path": "index.html",
+            "line": 3,
+            "new": '  <img src="hero.png" alt="Hero">',
+            "error": "OSError: [Errno 30] Read-only file system",
+        }
+    ]
+    assert result.tree_modified is True
+    assert not result.safe_to_ship
+    lines = (tmp_path / "index.html").read_text().splitlines()
+    assert lines[2] == '  <img src="hero.png" alt="Hero">', "still on disk, and said so"
+
+
+def test_audit_failure_in_the_final_gate_does_not_abort_the_run(tmp_path):
+    """_final_gate's audit write sat outside every try. A blip there discarded
+    both verified patches and left them applied with no result to explain
+    them -- the worst moment to fail, because every patch is already on disk."""
+    root = _setup_two(tmp_path)
+    store = BlowUpStore("final_scan")
+
+    result = run_remediation(
+        FakeModel([LOGO_FIX, HERO_FIX]), store, "run-gate-audit", root, "http://x",
+        scan=_scans([VIOLATION, HERO], []),
+        verifier=lambda url, target, baseline, scan=None: Verdict.RESOLVED,
+    )
+
+    assert [p.new for p in result.verified] == [
+        '  <img src="logo.png" alt="Logo">',
+        '  <img src="hero.png" alt="Hero">',
+    ]
+    assert result.final_scan_ok is True
+    assert result.safe_to_ship
+    assert result.audit_complete is False
+    assert result.dropped_audit[0]["step"] == "final_scan"
+
+
+def test_an_audit_blip_mid_loop_does_not_discard_a_good_patch(tmp_path):
+    """The loop's own audit writes are inside the try, so before this fix a
+    failed write on the `verify` step was caught as a violation error and the
+    verified patch was reverted. An RPC fault must not undo real work."""
+    root = _setup(tmp_path)
+    store = BlowUpStore("verify")
+
+    result = run_remediation(
+        FakeModel([LOGO_FIX]), store, "run-loop-audit", root, "http://x",
+        scan=_scans([VIOLATION], []),
+        verifier=lambda url, target, baseline, scan=None: Verdict.RESOLVED,
+    )
+
+    assert [p.new for p in result.verified] == ['  <img src="logo.png" alt="Logo">']
+    assert result.triaged == []
+    assert result.safe_to_ship
+    assert [e["step"] for e in result.dropped_audit] == ["verify"]
+
+
+def test_a_gate_that_breaks_after_the_scan_says_it_could_not_verify(tmp_path, monkeypatch):
+    """Last-resort guard. If grading itself breaks -- after the re-scan ran and
+    with every candidate already applied -- the run still returns, reports
+    ``final_scan_ok`` False instead of raising, and lists the candidates it
+    left on disk: they are edits that are not in ``verified``."""
+    root = _setup_two(tmp_path)
+
+    def exploding_identity(violation):
+        raise RuntimeError("grading blew up")
+
+    monkeypatch.setattr("app.runner.identity", exploding_identity)
+    result = run_remediation(
+        FakeModel([LOGO_FIX, HERO_FIX]), _store(), "run-gate-broken", root, "http://x",
+        scan=_scans([VIOLATION, HERO], []),
+        verifier=lambda url, target, baseline, scan=None: Verdict.RESOLVED,
+    )
+
+    assert result.verified == [], "nothing may be called verified when grading failed"
+    assert result.final_scan_ok is False
+    assert not result.safe_to_ship
+    assert result.tree_modified is True
+    assert [e["new"] for e in result.unreverted] == [
+        '  <img src="logo.png" alt="Logo">',
+        '  <img src="hero.png" alt="Hero">',
+    ]
+    assert all("final_gate_failed: RuntimeError" in e["error"] for e in result.unreverted)
