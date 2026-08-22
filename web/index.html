@@ -4,39 +4,119 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Accessibility Remediation Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/console.css">
 </head>
 <body>
   <a class="skip" href="#main">Skip to main content</a>
   <div class="shell">
+    <header class="topbar">
+      <p class="wordmark">Accessibility Remediation Console</p>
+      <p class="tagline">Every fix is re-rendered and re-scanned before it ships. Failed fixes are reverted, not hidden.</p>
+    </header>
     <nav class="rail" aria-label="Sections">
-      <p class="rail-title">Remediation</p>
-      <ul>
-        <li><a href="#main" aria-current="page">Runs</a></li>
+      <p class="rail-title">Console</p>
+      <ul class="rail-nav">
+        <li><a href="#main" aria-current="page"><span>Runs</span><span id="rail-count" class="rail-count">0</span></a></li>
       </ul>
+      <div class="rail-method" aria-labelledby="method-heading">
+        <p id="method-heading" class="rail-subtitle">How a run works</p>
+        <ol class="method-steps">
+          <li><span class="step-index">1</span><span>Render the pull request's page and run axe-core</span></li>
+          <li><span class="step-index">2</span><span>Ask Gemini for a source patch per violation, screenshot plus DOM</span></li>
+          <li><span class="step-index">3</span><span>Re-render and re-scan — the verification gate</span></li>
+          <li><span class="step-index">4</span><span>Ship only what verified; revert and triage the rest</span></li>
+        </ol>
+      </div>
+      <div class="rail-stats" aria-label="Field context">
+        <p class="rail-subtitle">Why this matters</p>
+        <p class="rail-stat"><strong>95.9%</strong> of the top million home pages have a detectable WCAG failure<br><span class="rail-cite">WebAIM Million, Feb 2026</span></p>
+        <p class="rail-stat"><strong>2027-04-26</strong> DOJ Title II compliance deadline for large public entities<br><span class="rail-cite">ADA Title II final rule</span></p>
+      </div>
     </nav>
     <div class="content">
       <nav class="crumbs" aria-label="Breadcrumb">
-        <ol><li>Home</li><li aria-current="page">Runs</li></ol>
+        <ol><li>Console</li><li aria-current="page">Runs</li></ol>
       </nav>
       <main id="main">
         <h1>Runs</h1>
-        <p id="empty" class="empty" hidden>No runs yet. A run appears here once a pull request triggers a scan.</p>
-        <table class="grid">
+        <p class="lede">One row per pull request the agent watched. Open a run to see the verification ledger — every violation it found, the patch it proposed, and whether that patch survived the re-scan.</p>
+
+        <div id="empty" hidden>
+          <p class="empty">
+            <strong>No runs yet.</strong> A run appears here the moment a pull request triggers a scan: the agent
+            renders the page, finds violations with axe-core, proposes a source patch per violation, then
+            re-renders and re-scans to verify each one before it ships. Nothing above is a synthetic row —
+            this is what the console looks like before its first real one.
+          </p>
+          <div class="example" aria-labelledby="example-heading">
+            <p id="example-heading" class="example-tag">Example — illustrates the format, not a real run</p>
+            <ul class="ledger">
+              <li class="ledger-item" data-verdict="pass">
+                <details>
+                  <summary>
+                    <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="rule"><span class="rule-label">image-alt</span></span>
+                    <span class="summary-reason">Verified — the re-scan found this clear.</span>
+                    <span class="summary-path">index.html:12</span>
+                  </summary>
+                  <div class="ledger-body">
+                    <div class="diff">
+                      <span class="diff-line old"><span class="diff-marker" aria-hidden="true">−</span>&lt;img src="logo.svg"&gt;</span>
+                      <span class="diff-line new"><span class="diff-marker" aria-hidden="true">+</span>&lt;img src="logo.svg" alt="Northwind Parks"&gt;</span>
+                    </div>
+                    <p class="rationale"><strong>Rationale:</strong> added descriptive alt text naming the organisation.</p>
+                  </div>
+                </details>
+              </li>
+              <li class="ledger-item" data-verdict="reverted">
+                <details>
+                  <summary>
+                    <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="rule"><span class="rule-label">color-contrast</span></span>
+                    <span class="summary-reason">Reverted — the patch introduced a new violation.</span>
+                    <span class="summary-path">styles.css:23</span>
+                  </summary>
+                  <div class="ledger-body">
+                    <p class="no-diff">A rejected patch's diff is not kept in the ledger — only a verified fix's is.</p>
+                  </div>
+                </details>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <table class="grid" id="runs-table">
           <caption class="sr-only">Remediation runs, newest first</caption>
           <thead>
             <tr>
-              <th scope="col">Repository</th><th scope="col">PR</th>
-              <th scope="col">Status</th><th scope="col">Verified fixes</th>
+              <th scope="col">Repository</th>
+              <th scope="col">PR</th>
+              <th scope="col">Status</th>
+              <th scope="col">Verified</th>
+              <th scope="col">Safe to ship</th>
             </tr>
           </thead>
           <tbody id="rows"></tbody>
         </table>
+
         <section id="detail" hidden aria-labelledby="detail-heading">
-          <h2 id="detail-heading">Run detail</h2>
+          <div class="detail-head">
+            <h2 id="detail-heading">Run detail</h2>
+            <p id="detail-sub" class="detail-sub"></p>
+          </div>
+
           <dl id="verification" class="verification" aria-label="Verification status"></dl>
+
+          <h3>Verification ledger</h3>
+          <p class="section-note">Every violation this run touched. Verified fixes carry their diff; reverted patches stay visible, struck through, with the reason they did not ship.</p>
+          <ul id="ledger" class="ledger" aria-label="Violations found in this run"></ul>
+
           <h3>Reasoning chain</h3>
-          <ol id="trail" aria-live="polite"></ol>
+          <p class="section-note">Raw audit trail, in order, exactly as written by the run.</p>
+          <ol id="trail" class="trail" aria-live="polite"></ol>
         </section>
       </main>
     </div>
