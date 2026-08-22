@@ -27,8 +27,12 @@ class RunResult:
 
     @property
     def safe_to_ship(self) -> bool:
-        """True only when the final whole-page re-scan ran, found nothing above
-        the baseline, and every revert this run attempted succeeded.
+        """True only when the final whole-page re-scan ran, saw nothing beyond
+        what the run should have left behind, and had no revert fail.
+
+        When it is True the final scan observed the exact tree that would be
+        committed: every rejected patch was reverted before that scan, and any
+        patch dropped *at* the gate puts an entry in ``reappeared``.
 
         ``reappeared`` covers both a target that came back and a new violation
         nobody attributed to a patch; either way the page is worse than the
@@ -163,7 +167,8 @@ def run_remediation(
                 continue
 
             # One violation blowing up must not cost the run every patch already
-            # verified, and must never leave its own patch on disk. A raising
+            # verified, and must not leave its own patch on disk without saying
+            # so -- the revert can itself fail, and then it is reported. A raising
             # verifier (Playwright timeout) and a raising model (vertex 429
             # RESOURCE_EXHAUSTED) are the two likeliest live failures; both land
             # in the handler below.

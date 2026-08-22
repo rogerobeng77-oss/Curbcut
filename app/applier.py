@@ -27,7 +27,7 @@ def _swap(patch: Patch, root: str, expect: str, replace_with: str) -> bool:
 def apply_patch(patch: Patch, root: str) -> bool:
     # Second line of defence. propose_patch rejects a multi-line replacement
     # before a Patch exists, but Patch is a plain dataclass anyone can build,
-    # and a patch that cannot be reverted must never reach the file.
+    # a multi-line replacement cannot be reverted, so it must not reach the file.
     if contains_line_break(patch.new):
         log_event("patch.apply_failed", severity="WARNING", path=patch.path, reason="multiline")
         return False

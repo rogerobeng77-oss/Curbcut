@@ -12,7 +12,9 @@ from substrate.telemetry import log_event, span
 # of these grows the file by a line: apply succeeds, and revert then finds
 # lines[index] != patch.new and cannot restore the file. A rejected patch would
 # stay on disk and get swept into the PR by `git commit -am`. One line in, one
-# line out is the constraint that keeps every patch reversible.
+# line out keeps apply and revert symmetrical. It is not a guarantee of
+# reversibility on its own: a later patch that rewrites the same line still
+# defeats revert, which is why app/runner.py reports every revert outcome.
 LINE_BREAKS = "\n\r\v\f\x1c\x1d\x1e\x85\u2028\u2029"
 
 
