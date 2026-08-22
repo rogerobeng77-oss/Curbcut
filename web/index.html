@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Accessibility Remediation Console</title>
+  <link rel="stylesheet" href="/static/console.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to main content</a>
+  <div class="shell">
+    <nav class="rail" aria-label="Sections">
+      <p class="rail-title">Remediation</p>
+      <ul>
+        <li><a href="#main" aria-current="page">Runs</a></li>
+      </ul>
+    </nav>
+    <div class="content">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <ol><li>Home</li><li aria-current="page">Runs</li></ol>
+      </nav>
+      <main id="main">
+        <h1>Runs</h1>
+        <p id="empty" class="empty" hidden>No runs yet. A run appears here once a pull request triggers a scan.</p>
+        <table class="grid">
+          <caption class="sr-only">Remediation runs, newest first</caption>
+          <thead>
+            <tr>
+              <th scope="col">Repository</th><th scope="col">PR</th>
+              <th scope="col">Status</th><th scope="col">Verified fixes</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <section id="detail" hidden aria-labelledby="detail-heading">
+          <h2 id="detail-heading">Run detail</h2>
+          <dl id="verification" class="verification" aria-label="Verification status"></dl>
+          <h3>Reasoning chain</h3>
+          <ol id="trail" aria-live="polite"></ol>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script src="/static/console.js"></script>
+</body>
+</html>

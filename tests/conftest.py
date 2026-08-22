@@ -1,5 +1,10 @@
 import os
 
+# app.main builds a module-level Store at import time. Setting this before
+# any test module imports app.main makes that Store a FakeFirestore instead
+# of one that opens a real connection during collection.
+os.environ["USE_FAKE_STORE"] = "1"
+
 import pytest
 
 
