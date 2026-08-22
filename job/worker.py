@@ -282,9 +282,17 @@ def main() -> None:
                      f"fix: {len(result.verified)} verified accessibility violation(s)"],
                     token,
                 )
+                # No -c http.extraheader here: `git clone -c http.extraheader=…`
+                # (above) persists that setting into this checkout's own
+                # .git/config -- confirmed by reading the config after clone
+                # -- so repeating it here does not merely no-op, it sends
+                # the Authorization header twice. Verified live: GitHub's
+                # git-over-HTTPS endpoint rejected that with
+                # `remote: Duplicate header: "Authorization"` and a 400,
+                # surfaced to git as a bare "returned non-zero exit status
+                # 128". Push authenticates from the persisted clone config.
                 _run_git(
-                    ["git", "-C", workdir, "-c", f"http.extraheader={auth_header}",
-                     "push", "origin", f"HEAD:refs/heads/{branch}"],
+                    ["git", "-C", workdir, "push", "origin", f"HEAD:refs/heads/{branch}"],
                     token, auth_header,
                 )
 
