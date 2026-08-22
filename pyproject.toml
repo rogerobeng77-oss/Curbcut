@@ -41,3 +41,4 @@ deploy-python = "3.13"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+markers = ["slow: exercises a real headless browser scan; slower than the unit suite"]
