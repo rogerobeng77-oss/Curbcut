@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "a11y-agent"
 version = "0.1.0"
@@ -12,10 +16,16 @@ dependencies = [
     "opentelemetry-exporter-gcp-trace>=1.6.0",
     "fastapi>=0.111.0",
     "uvicorn>=0.30.0",
+    "playwright>=1.45.0",
+    "PyGithub>=2.3.0",
+    "requests>=2.32.0",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0.0", "pytest-asyncio>=0.23.0", "httpx2>=2.0.0", "requests>=2.32.0"]
+
+[tool.setuptools.packages.find]
+include = ["substrate*", "app*"]
 
 [tool.substrate]
 # The Python the container is built on. Declared here so there is one place to
