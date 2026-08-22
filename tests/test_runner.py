@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from app.patcher import Patch
 from app.runner import run_remediation
 from app.scanner import Violation
@@ -112,23 +114,35 @@ def test_run_writes_an_audit_trail(tmp_path):
     assert steps == ["scan", "locate", "propose", "apply", "verify", "final_scan"]
 
 
-def test_INVARIANT_every_returned_patch_was_verified_resolved(tmp_path):
-    """CORE INVARIANT — do not weaken. No unverified change may be returned."""
+@pytest.mark.parametrize("verdict", [Verdict.UNRESOLVED, Verdict.REGRESSED])
+def test_INVARIANT_every_returned_patch_was_verified_resolved(tmp_path, verdict):
+    """CORE INVARIANT — do not weaken. No unverified change may be returned.
+
+    Both non-resolved verdicts, not just UNRESOLVED: mutating the guard to
+    `verdict is not Verdict.UNRESOLVED` accepts REGRESSED, and a test that only
+    ever feeds UNRESOLVED stays green through that mutation.
+
+    The scanner fake shows a clean page after the patch on purpose, so the
+    final gate cannot cover for the loop's guard here. If the guard lets a
+    non-resolved patch through, the gate sees nothing wrong with the page and
+    returns it as verified — which is what this test must catch.
+    """
     root = _setup(tmp_path)
     seen = []
 
     def recording_verifier(url, target, baseline, scan=None):
         seen.append(target)
-        return Verdict.UNRESOLVED
+        return verdict
 
     model = FakeModel([_reply('  <img src="logo.png">', '  <img src="logo.png" alt="Logo">')])
     result = run_remediation(
         model, _store(), "run-6", root, "http://x",
-        scan=lambda url: ([VIOLATION], b"png"),
+        scan=_scans([VIOLATION], []),
         verifier=recording_verifier,
     )
     assert seen, "verifier must be called for every proposed patch"
-    assert result.verified == [], "an unresolved patch must never be returned as verified"
+    assert result.verified == [], "an unverified patch must never be returned as verified"
+    assert result.triaged[0]["reason"] == verdict.value
 
 
 def test_not_located_is_triaged_not_crashed(tmp_path):

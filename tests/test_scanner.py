@@ -46,3 +46,20 @@ def test_scan_populates_selector_and_html():
     image_alt = next(v for v in violations if v.rule == "image-alt")
     assert image_alt.selector
     assert "<img" in image_alt.html
+
+
+@pytest.mark.slow
+def test_scan_reports_rules_outside_supported_rules(tmp_path):
+    """scan_page must not filter. SUPPORTED_RULES is what the remediation loop
+    can patch; if the scanner dropped everything else, verify() and the
+    runner's final gate would both be blind to a patch that introduces, say,
+    heading-order — and it would verify clean."""
+    (tmp_path / "index.html").write_text(
+        "<!doctype html><html lang=en><head><title>t</title></head>"
+        "<body><main><h1>One</h1><h3>Three</h3></main></body></html>"
+    )
+    with serve(str(tmp_path)) as url:
+        violations, _ = scan_page(url)
+    rules = {v.rule for v in violations}
+    assert "heading-order" in rules
+    assert not rules & SUPPORTED_RULES, "this page seeds only an unsupported rule"
