@@ -91,8 +91,21 @@ def build_run_record(
     }
 
 
-def _redact(text: str, secret: str) -> str:
-    return text.replace(secret, "[REDACTED]") if secret else text
+def _redact(text: str, *secrets: str) -> str:
+    """Scrub every occurrence of every secret in `secrets` from `text`.
+
+    Verified live and the hard way, twice: redacting only the raw token
+    string missed the base64-encoded `Authorization: Basic ...` header this
+    job builds from it (`_git_auth_header`) -- a *different* string that
+    still decodes straight back to the token, and it reached Cloud Logging
+    in plain (if base64-"encoded") text via exactly the code path this
+    function exists to close. `_run_git` and the top-level handler now pass
+    every secret-shaped value in play, not just the token itself.
+    """
+    for secret in secrets:
+        if secret:
+            text = text.replace(secret, "[REDACTED]")
+    return text
 
 
 def _git_auth_header(token: str) -> str:
@@ -112,29 +125,43 @@ def _git_auth_header(token: str) -> str:
     return "Authorization: Basic " + base64.b64encode(f"x-access-token:{token}".encode()).decode()
 
 
-def _run_git(args: list[str], token: str) -> None:
-    """subprocess.run(args, check=True), with the GitHub token scrubbed from
-    whatever this raises.
+def _run_git(args: list[str], *secrets: str) -> None:
+    """subprocess.run(args, check=True), with every value in `secrets`
+    scrubbed from whatever this raises -- pass the token *and* any derived
+    value (e.g. `_git_auth_header`'s base64 form) that could also appear in
+    `args`; see `_redact`.
 
     Verified live and the hard way: an unhandled `CalledProcessError` from a
-    `git clone`/`push` invoked with `-c http.extraheader=Authorization:
-    Bearer <token>` prints its own `.cmd` in the default traceback, which
-    contains that header verbatim -- and Cloud Run Jobs sends an unhandled
-    exception's traceback straight to Cloud Logging, a durable, exportable
-    sink. That happened once during this batch's own deploy testing (a
-    scratch, since-flagged-for-rotation token; see README/report). Every
-    call site that can put the token in an argv list goes through this
+    `git clone`/`push` invoked with an auth header in argv prints its own
+    `.cmd` in the default traceback, which contains that header verbatim --
+    and Cloud Run Jobs sends an unhandled exception's traceback straight to
+    Cloud Logging, a durable, exportable sink. That happened twice during
+    this batch's own deploy testing, against a scratch, since-flagged-for-
+    rotation token (see README/report): once for the raw token, once more
+    for its base64 encoding after the first fix covered only the former.
+    Every call site that can put a secret in an argv list goes through this
     function instead of a bare `subprocess.run`.
+
+    On failure this also logs the (redacted) stderr at ERROR, once, here --
+    the caller's own handling only ever sees a `CalledProcessError` whose
+    `str()` is the exit code and the redacted command, never the stderr that
+    actually explains the failure; without this line diagnosing a real git
+    failure meant reproducing it by hand.
     """
     try:
         subprocess.run(args, check=True, capture_output=True, text=True)
     except subprocess.CalledProcessError as exc:
-        raise subprocess.CalledProcessError(
+        sanitized = subprocess.CalledProcessError(
             exc.returncode,
-            [_redact(arg, token) for arg in exc.cmd],
-            output=_redact(exc.output or "", token),
-            stderr=_redact(exc.stderr or "", token),
-        ) from None
+            [_redact(arg, *secrets) for arg in exc.cmd],
+            output=_redact(exc.output or "", *secrets),
+            stderr=_redact(exc.stderr or "", *secrets),
+        )
+        log_event(
+            "run.git_failed", severity="ERROR",
+            cmd=sanitized.cmd, returncode=exc.returncode, stderr=sanitized.stderr,
+        )
+        raise sanitized from None
 
 
 def _wait_until_serving(url: str, timeout: float = 10.0) -> None:
@@ -213,7 +240,7 @@ def main() -> None:
                 "-c", f"http.extraheader={auth_header}",
                 f"https://github.com/{args['repo']}.git", workdir,
             ],
-            token,
+            token, auth_header,
         )
 
         port = "8081"
@@ -258,7 +285,7 @@ def main() -> None:
                 _run_git(
                     ["git", "-C", workdir, "-c", f"http.extraheader={auth_header}",
                      "push", "origin", f"HEAD:refs/heads/{branch}"],
-                    token,
+                    token, auth_header,
                 )
 
             ref = PullRequestRef(args["repo"], args["pr"], args["head_ref"], args["head_sha"])
@@ -278,7 +305,8 @@ def main() -> None:
             # publish step failed.
             log_event(
                 "run.publish_failed", severity="ERROR", run_id=run_id,
-                repo=args["repo"], pr=args["pr"], error=_redact(f"{type(exc).__name__}: {exc}", token),
+                repo=args["repo"], pr=args["pr"],
+                error=_redact(f"{type(exc).__name__}: {exc}", token, auth_header),
             )
             store.put("runs", run_id, build_run_record(run_id, args, result, status="failed"))
             raise
@@ -303,11 +331,13 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as exc:  # noqa: BLE001 - see the docstring
-        # Last-resort scrub. _run_git already redacts the token from a
-        # CalledProcessError it raises, but this is defense in depth for
-        # anything else that could put the token in a message reaching the
-        # default, uncaught-exception traceback -- which Cloud Run Jobs
-        # forwards to Cloud Logging verbatim. GITHUB_TOKEN may be unset if
-        # main() failed before reading it, hence the getenv rather than []..
+        # Last-resort scrub. _run_git already redacts the token (and its
+        # derived auth header -- see _redact's docstring for why both are
+        # needed) from a CalledProcessError it raises, but this is defense
+        # in depth for anything else that could put either in a message
+        # reaching the default, uncaught-exception traceback, which Cloud
+        # Run Jobs forwards to Cloud Logging verbatim. GITHUB_TOKEN may be
+        # unset if main() failed before reading it, hence getenv over [].
         token = os.environ.get("GITHUB_TOKEN", "").strip()
-        raise RuntimeError(_redact(f"{type(exc).__name__}: {exc}", token)) from None
+        auth_header = _git_auth_header(token) if token else ""
+        raise RuntimeError(_redact(f"{type(exc).__name__}: {exc}", token, auth_header)) from None

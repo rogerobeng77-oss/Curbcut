@@ -87,27 +87,50 @@ def test_run_record_reports_an_unsafe_run_honestly():
     assert record["pr_url"] is None
 
 
-def test_redact_replaces_every_occurrence_of_the_secret():
-    assert _redact("token=sekrit and sekrit again", "sekrit") == (
-        "token=[REDACTED] and [REDACTED] again"
-    )
+def test_redact_replaces_every_occurrence_of_every_secret():
+    text = _redact("token=sekrit-one and blob=sekrit-two, sekrit-one again", "sekrit-one", "sekrit-two")
+    assert "sekrit-one" not in text
+    assert "sekrit-two" not in text
+    assert text.count("[REDACTED]") == 3
 
 
-def test_redact_is_a_noop_for_an_empty_secret():
+def test_redact_is_a_noop_with_no_secrets():
+    assert _redact("nothing to hide") == "nothing to hide"
     assert _redact("nothing to hide", "") == "nothing to hide"
 
 
-def test_run_git_scrubs_the_token_from_a_failed_command():
+def test_run_git_scrubs_every_secret_from_a_failed_command():
     # Verified live: an unhandled CalledProcessError from a git subprocess
     # invoked with the token in argv (http.extraheader) printed the token in
     # plain text to Cloud Logging via its own .cmd repr. This pins that a
-    # failure from _run_git can never carry the token in any of its fields.
+    # failure from _run_git can never carry any passed secret in any field.
     with pytest.raises(subprocess.CalledProcessError) as excinfo:
-        _run_git(["python3", "-c", "import sys; sys.exit(1)", "--token=sekrit-value"], "sekrit-value")
+        _run_git(
+            ["python3", "-c", "import sys; sys.exit(1)", "--token=sekrit-value", "--other=base64blob"],
+            "sekrit-value", "base64blob",
+        )
     exc = excinfo.value
     assert "sekrit-value" not in str(exc)
+    assert "base64blob" not in str(exc)
     assert "sekrit-value" not in " ".join(exc.cmd)
-    assert "[REDACTED]" in " ".join(exc.cmd)
+    assert "base64blob" not in " ".join(exc.cmd)
+
+
+def test_run_git_scrubs_a_derived_secret_a_raw_token_redaction_alone_would_miss():
+    # Regression: redacting only the raw token missed the base64-encoded
+    # Authorization header this job actually puts in argv (_git_auth_header)
+    # -- a different string that still decodes straight back to the token.
+    # Verified live: this leaked to Cloud Logging in plain (if
+    # base64-"encoded") text before _run_git took *secrets instead of one.
+    from job.worker import _git_auth_header
+
+    header = _git_auth_header("sekrit-value")
+    with pytest.raises(subprocess.CalledProcessError) as excinfo:
+        _run_git(
+            ["python3", "-c", "import sys; sys.exit(1)", f"-c http.extraheader={header}"],
+            "sekrit-value", header,
+        )
+    assert header not in " ".join(excinfo.value.cmd)
 
 
 def test_run_git_succeeds_silently_for_a_zero_exit():
