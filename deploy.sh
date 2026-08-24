@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SERVICE="${1:?usage: deploy.sh <service-name>}"
-PROJECT="total-fiber-399801"
+PROJECT="${GCP_PROJECT:?set GCP_PROJECT to your Google Cloud project id}"
 REGION="us-central1"
 
 gcloud run deploy "$SERVICE" \

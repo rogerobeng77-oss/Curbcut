@@ -6,3 +6,9 @@ __pycache__/
 .harness/
 app/_axe.min.js
 screenshots/
+
+# Hackathon submission scaffolding — drafted here, published elsewhere.
+# Not part of the product; kept local so the public repo is just the agent.
+DEVPOST.md
+SOCIAL.md
+DEMO_SCRIPT.md
