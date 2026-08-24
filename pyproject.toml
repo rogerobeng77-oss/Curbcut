@@ -7,6 +7,17 @@ name = "curbcut"
 version = "0.1.0"
 requires-python = ">=3.10"
 dependencies = [
+    # google-api-core is pinned below 2.35.0, and the ceiling is load-bearing.
+    # 2.35.0 percent-encodes path segments when building a resource name, so
+    # Firestore's DEFAULT_DATABASE "(default)" becomes "%28default%29" and every
+    # query fails server-side with `400 Invalid database id %28default%29`.
+    # Reproduced offline by bisecting the five packages a rebuild moved:
+    #   api-core 2.34.0 -> projects/p/databases/(default)      works
+    #   api-core 2.35.0 -> projects/p/databases/%28default%29  400s
+    # firestore, google-auth and google-cloud-core were all ruled out; only
+    # api-core changes the result. tests/test_dependency_pins.py fails loudly
+    # if a future resolution reintroduces this.
+    "google-api-core>=2.34.0,<2.35.0",
     "google-adk>=2.7.1",
     "google-genai>=2.19.0",
     "google-cloud-firestore>=2.16.0",
