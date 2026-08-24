@@ -1,0 +1,199 @@
+[  1/199] ERR    0 patchable /    0 nodes  Azure-Samples/html-docs-hello-world
+[  2/199] ERR    0 patchable /    0 nodes  superfly/docs
+[  3/199] ERR    0 patchable /    0 nodes  MicrosoftDocs/pipelines-dotnet-core
+[  4/199] ok    99 patchable /  106 nodes  fastlane/docs
+[  5/199] ERR    0 patchable /    0 nodes  MinecraftForge/Documentation
+[  6/199] ok     1 patchable /   13 nodes  pantheon-systems/documentation
+[  7/199] ok    18 patchable /   19 nodes  Polymer/old-docs-site
+[  8/199] ok     2 patchable /    3 nodes  knative/docs
+[  9/199] ok     3 patchable /    7 nodes  pulumi/docs
+[ 10/199] ERR    0 patchable /    0 nodes  Kucoin/kucoin-api-docs
+[ 11/199] ERR    0 patchable /    0 nodes  gohugoio/hugoDocs
+[ 12/199] ok    39 patchable /   44 nodes  ionic-team/ionic-docs
+[ 13/199] ok     5 patchable /   12 nodes  SeleniumHQ/www.seleniumhq.org
+[ 14/199] ok     1 patchable /    5 nodes  phalcon-orphanage/docs
+[ 15/199] ok    27 patchable /   30 nodes  cockroachdb/docs
+[ 16/199] ok     0 patchable /    5 nodes  fullcalendar/fullcalendar-docs
+[ 17/199] ok     3 patchable /    5 nodes  platformsh/platformsh-docs
+[ 18/199] ok     3 patchable /    8 nodes  AsahiLinux/docs
+[ 19/199] ERR    0 patchable /    0 nodes  mdn/webaudio-examples
+[ 20/199] ok   307 patchable /  332 nodes  UniversalDependencies/docs
+[ 21/199] ok     0 patchable /   11 nodes  openshift/openshift-docs
+[ 22/199] ok     0 patchable /   12 nodes  pi-hole/docs
+[ 23/199] ok     3 patchable /    6 nodes  travis-ci/docs-travis-ci-com
+[ 24/199] ok     4 patchable /    5 nodes  cloudfoundry/docs-bosh
+[ 25/199] ok     4 patchable /  559 nodes  ovh/docs
+[ 26/199] ok    17 patchable /   21 nodes  monome/docs
+[ 27/199] ERR    0 patchable /    0 nodes  MicrosoftDocs/pipelines-dotnet-core-docker
+[ 28/199] ok     8 patchable /   23 nodes  revel/revel.github.io
+[ 29/199] ok    17 patchable /   18 nodes  neo-project/docs
+[ 30/199] ok     6 patchable /    8 nodes  fuel/docs
+[ 31/199] ok    22 patchable /   35 nodes  nette/docs
+[ 32/199] ok     0 patchable /    1 nodes  thirdweb-dev/docs
+[ 33/199] ok     3 patchable /    5 nodes  inveniosoftware/docs-invenio-rdm
+[ 34/199] ERR    0 patchable /    0 nodes  reetasingh/CKAD-Bookmarks
+[ 35/199] ok     0 patchable /    0 nodes  localstack/docs
+[ 36/199] ok     8 patchable /   18 nodes  scala/docs.scala-lang
+[ 37/199] ERR    0 patchable /    0 nodes  GoogleChrome/multi-device
+[ 38/199] ok     5 patchable /   12 nodes  SeleniumHQ/docs
+[ 39/199] ERR    0 patchable /    0 nodes  evanca/quick-portfolio
+[ 40/199] ok     7 patchable /   13 nodes  varadbhogayata/varadbhogayata.github.io
+[ 41/199] ok     0 patchable /    1 nodes  cs50/docs
+[ 42/199] ERR    0 patchable /    0 nodes  thecodedealer/JS_CSS_PortfolioProject
+[ 43/199] ok     0 patchable /    2 nodes  mmistakes/minimal-mistakes
+[ 44/199] ok     0 patchable /    1 nodes  codewithsadee/vcard-personal-portfolio
+[ 45/199] ok    11 patchable /   25 nodes  rajaprerak/rajaprerak.github.io
+[ 46/199] ERR    0 patchable /    0 nodes  splunk/public-o11y-docs
+[ 47/199] ok    16 patchable /   18 nodes  smaranjitghose/awesome-portfolio-websites
+[ 48/199] ok    24 patchable /   35 nodes  rammcodes/Dopefolio
+[ 49/199] ok     0 patchable /    4 nodes  helfi92/studorlio
+[ 50/199] ERR    0 patchable /    0 nodes  akashyap2013/PortFolio_Website
+[ 51/199] ERR    0 patchable /    0 nodes  fireship-io/threejs-scroll-animation-demo
+[ 52/199] ok    13 patchable /   16 nodes  giotsere/minimalist-portfolio
+[ 53/199] ERR    0 patchable /    0 nodes  elidianaandrade/dio-lab-portfolio
+[ 54/199] ok     3 patchable /   15 nodes  sandhikagalih/sandhikagalih.github.io
+[ 55/199] ERR    0 patchable /    0 nodes  crearo/portfolio
+[ 56/199] ok    14 patchable /   17 nodes  CommunityPro/portfolio-html
+[ 57/199] ok    99 patchable /  173 nodes  hugo-themes/toha
+[ 58/199] ok     0 patchable /    4 nodes  avinash201199/Portfolio-Collection
+[ 59/199] ERR    0 patchable /    0 nodes  dennisivy/portfolio-website
+[ 60/199] ERR    0 patchable /    0 nodes  jordanhudgens/portfolio-html-site
+[ 61/199] ok    27 patchable /   27 nodes  iuricode/portfolio
+[ 62/199] ok    17 patchable /   29 nodes  thedevslot/WhatATheme
+[ 63/199] ok    15 patchable /   17 nodes  yousinix/portfolYOU
+[ 64/199] ok    25 patchable /   47 nodes  website-templates/portfolio_one-page-template
+[ 65/199] ok     0 patchable /    3 nodes  ishandeveloper/Portfolio
+[ 66/199] ERR    0 patchable /    0 nodes  Ade-mir/html-css-js-portfolio-tutorial-2
+[ 67/199] ok    52 patchable /   72 nodes  bmorelli25/portfolio-template
+[ 68/199] ok    12 patchable /   13 nodes  S44WN/hailee-portfolio-website
+[ 69/199] ok     0 patchable /    2 nodes  JoaoFranco03/photography-portfolio
+[ 70/199] ERR    0 patchable /    0 nodes  portfolio-central/jekyll-instagram-portfolio-theme
+[ 71/199] ERR    0 patchable /    0 nodes  Ksound22/developer-portfolio
+[ 72/199] ok    38 patchable /   69 nodes  alisolanki/Portfolio
+[ 73/199] ok    22 patchable /   23 nodes  themefisher/kross-jekyll
+[ 74/199] ok     3 patchable /   47 nodes  longpdo/neumorphism
+[ 75/199] ERR    0 patchable /    0 nodes  codrops/SegmentEffect
+[ 76/199] ERR    0 patchable /    0 nodes  SampurnaC/portfolio_website_fcc
+[ 77/199] ok     7 patchable /    8 nodes  femascheti/portfolio-de-projetos
+[ 78/199] ok    15 patchable /   25 nodes  volny/stylish-portfolio-jekyll
+[ 79/199] ERR    0 patchable /    0 nodes  microsoft/SmartHotel360-Website
+[ 80/199] ok     0 patchable /    0 nodes  alphagov/accessibility-tool-audit
+[ 81/199] ok     3 patchable /   12 nodes  WebAssembly/website
+[ 82/199] ERR    0 patchable /    0 nodes  developedbyed/glass-website
+[ 83/199] ok    19 patchable /   21 nodes  themefisher/airspace-hugo
+[ 84/199] ERR    0 patchable /    0 nodes  bedimcode/responsive-portfolio-website-Alexa
+[ 85/199] ok     1 patchable /    3 nodes  spring-ai-alibaba/website
+[ 86/199] ok     5 patchable /    7 nodes  apache/dubbo-website
+[ 87/199] ERR    0 patchable /    0 nodes  sharecuts/website
+[ 88/199] ERR    0 patchable /    0 nodes  designmodo/html-website-templates
+[ 89/199] ERR    0 patchable /    0 nodes  akashyap2013/Blooger_Website
+[ 90/199] ok     9 patchable /    9 nodes  Pi-Apps-Coders/website
+[ 91/199] ok    12 patchable /   16 nodes  tektoncd/website
+[ 92/199] ERR    0 patchable /    0 nodes  servicemesher/website
+[ 93/199] ok     0 patchable /    1 nodes  EvilInsultGenerator/website
+[ 94/199] ERR    0 patchable /    0 nodes  cloudacademy/static-website-example
+[ 95/199] ok    15 patchable /   16 nodes  phalcon/website
+[ 96/199] ok     0 patchable /   15 nodes  jigar-sable/Portfolio-Website
+[ 97/199] ok    19 patchable /   32 nodes  developer-portal/website
+[ 98/199] ERR    0 patchable /    0 nodes  microsoft/project-html-website
+[ 99/199] ok     1 patchable /    3 nodes  ReChronoRain/website
+[100/199] ERR    0 patchable /    0 nodes  OpenClassrooms-Student-Center/GameOn-website-FR
+[101/199] ERR    0 patchable /    0 nodes  meteor-vegas/website
+[102/199] ok     6 patchable /   11 nodes  BuckyMaler/global
+[103/199] ERR    0 patchable /    0 nodes  simple-login/website
+[104/199] ok     2 patchable /    4 nodes  crimethinc/website
+[105/199] ERR    0 patchable /    0 nodes  openssl/web
+[106/199] ok    17 patchable /   17 nodes  unstoppabledomains/decentralized-websites
+[107/199] ok     0 patchable /    0 nodes  miniflux/website
+[108/199] ok    34 patchable /   39 nodes  linuxkerneltravel/website
+[109/199] ok    36 patchable /   61 nodes  yeoman/yeoman.io
+[110/199] ERR    0 patchable /    0 nodes  LukeSmithxyz/based.cooking
+[111/199] ok     7 patchable /   13 nodes  freegate-release/website
+[112/199] ERR    0 patchable /    0 nodes  Neovenchy/Discord-bot-website-template
+[113/199] ok    22 patchable /   30 nodes  verekia/initializr-website
+[114/199] ERR    0 patchable /    0 nodes  OsProgramadores/op-website-hugo
+[115/199] ok    15 patchable /   24 nodes  ShaifArfan/one-page-website-html-css-project
+[116/199] ok     1 patchable /    9 nodes  FreeRDP/freerdp.github.io
+[117/199] ok     2 patchable /    3 nodes  serialport/website
+[118/199] ok     3 patchable /   18 nodes  TokTok/website
+[119/199] ERR    0 patchable /    0 nodes  flexdinesh/dev-landing-page
+[120/199] ok     1 patchable /    3 nodes  neon-bindings/website
+[121/199] ok     3 patchable /   24 nodes  tailwindtoolbox/Landing-Page
+[122/199] ok     2 patchable /    4 nodes  joshbuchea/awesome-app-landing-page
+[123/199] ok     1 patchable /   12 nodes  YaninaTrekhleb/restaurant-website
+[124/199] ok   200 patchable /  204 nodes  typora/theme.typora.io
+[125/199] ok    44 patchable /   57 nodes  PaulleDemon/awesome-landing-pages
+[126/199] ERR    0 patchable /    0 nodes  alexandresaints/landing-page-tutorial
+[127/199] ok    25 patchable /   65 nodes  mhaecal/skilline-landing-page
+[128/199] ok     5 patchable /   13 nodes  tailwindtoolbox/Rainblur-Landing-Page
+[129/199] ok     1 patchable /    4 nodes  adrienjoly/landing-page-boilerplate
+[130/199] ERR    0 patchable /    0 nodes  thecodercoder/fem-easybank
+[131/199] ERR    0 patchable /    0 nodes  breatheco-de/exercise-collaborative-html-website
+[132/199] ok     0 patchable /    2 nodes  zuramai/mazer
+[133/199] ok     5 patchable /    8 nodes  tailwindtoolbox/App-Landing-Page
+[134/199] ERR    0 patchable /    0 nodes  bradtraversy/saas-landing-page
+[135/199] ok    21 patchable /   26 nodes  izzydoesizzy/resumetemplate
+[136/199] ERR    0 patchable /    0 nodes  udacity/cd0428-landing-page
+[137/199] ok     0 patchable /    2 nodes  MobileNativeFoundation/mobilenativefoundation.org
+[138/199] ok     4 patchable /    8 nodes  excentris/compass
+[139/199] ERR    0 patchable /    0 nodes  digitalinnovationone/trilha-css-desafio-01
+[140/199] ok     0 patchable /    3 nodes  sonic-net/SONiC
+[141/199] ok     0 patchable /   21 nodes  tailwindtoolbox/Screenshot-Landing-Page
+[142/199] ok     8 patchable /   17 nodes  kedacore/keda-docs
+[143/199] ok     5 patchable /   74 nodes  0silverback0/LandingPages
+[144/199] ok    11 patchable /   30 nodes  themesberg/tailwind-landing-page
+[145/199] ERR    0 patchable /    0 nodes  Tailus-UI/ada-html
+[146/199] ok    32 patchable /   34 nodes  tilt-dev/tilt.build
+[147/199] ok    13 patchable /   77 nodes  themesberg/landwind
+[148/199] ERR    0 patchable /    0 nodes  CodeYourFuture/HTML-CSS-Module-Project
+[149/199] ok    14 patchable /   16 nodes  ttntm/hugo-landing-page
+[150/199] ok     0 patchable /    8 nodes  ahmadsohail404/Netflix-UI-LandingPage
+[151/199] ok     9 patchable /   16 nodes  JastinXyz/discord-bot-landing-page-web
+[152/199] ok     0 patchable /    3 nodes  praveenscience/Creative-Simple-Landing-Pages
+[153/199] ok    15 patchable /   15 nodes  Larissakich/landing-page-food-theme
+[154/199] ok     6 patchable /   13 nodes  saroz/domain-for-sale
+[155/199] ok     1 patchable /    5 nodes  bigspotteddog/landing-page-service
+[156/199] ERR    0 patchable /    0 nodes  pranav07-git/Responsive-Landing-Page-Website
+[157/199] ok    19 patchable /   19 nodes  OWASP/www-project-zap
+[158/199] ERR    0 patchable /    0 nodes  luizomf/landing-page-cursojs
+[159/199] ERR    0 patchable /    0 nodes  codicts/Fashion-Landing-Page
+[160/199] ok     1 patchable /    2 nodes  biaochenxuying/blog
+[161/199] ok    59 patchable /   65 nodes  qiubaiying/qiubaiying.github.io
+[162/199] ERR    0 patchable /    0 nodes  eddycjy/blog
+[163/199] ERR    0 patchable /    0 nodes  yangkun19921001/Blog
+[164/199] ERR    0 patchable /    0 nodes  xy-sea/blog
+[165/199] ok    64 patchable /   75 nodes  Huxpro/huxpro.github.io
+[166/199] ok    67 patchable /   73 nodes  phil-opp/blog_os
+[167/199] ok     0 patchable /    2 nodes  xieranmaya/blog
+[168/199] ok     0 patchable /    1 nodes  StartBootstrap/startbootstrap-clean-blog-jekyll
+[169/199] ERR    0 patchable /    0 nodes  digoal/blog
+[170/199] ERR    0 patchable /    0 nodes  udacity/course-git-blog-project
+[171/199] ERR    0 patchable /    0 nodes  luizdepra/hugo-coder
+[172/199] ERR    0 patchable /    0 nodes  joeyguo/blog
+[173/199] ERR    0 patchable /    0 nodes  dmfeisal/simple-wedding-invitation
+[174/199] ERR    0 patchable /    0 nodes  atian25/blog
+[175/199] ok     0 patchable /   10 nodes  ccforward/cc
+[176/199] ok     0 patchable /    4 nodes  freddier/hyperblog
+[177/199] ERR    0 patchable /    0 nodes  vbuterin/blog
+[178/199] ERR    0 patchable /    0 nodes  wintercn/blog
+[179/199] ok     4 patchable /    4 nodes  peterroelants/peterroelants.github.io
+[180/199] ERR    0 patchable /    0 nodes  chemdemo/chemdemo.github.io
+[181/199] ERR    0 patchable /    0 nodes  ifwenvlook/blog
+[182/199] ok    13 patchable /   16 nodes  pnp/blog
+[183/199] ok     5 patchable /   11 nodes  youerning/blog
+[184/199] ok     0 patchable /    8 nodes  twbs/blog
+[185/199] ok    76 patchable /   78 nodes  mojombo/mojombo.github.io
+[186/199] ok    30 patchable /   36 nodes  Huxpro/huxblog-boilerplate
+[187/199] ERR    0 patchable /    0 nodes  petrkeil/Blog
+[188/199] ok     3 patchable /    8 nodes  rust-lang/blog.rust-lang.org
+[189/199] ok     0 patchable /    4 nodes  mvaneerde/blog
+[190/199] ok     1 patchable /    3 nodes  nunocoracao/blowfish
+[191/199] ok     4 patchable /   20 nodes  Pines-Cheng/blog
+[192/199] ok     0 patchable /   11 nodes  barretlee/blogChat
+[193/199] ok     0 patchable /    3 nodes  mode/blog
+[194/199] ERR    0 patchable /    0 nodes  NVIDIA-developer-blog/code-samples
+[195/199] ok   248 patchable /  258 nodes  justjavac/justjavac.github.com
+[196/199] ERR    0 patchable /    0 nodes  jaiswaladi246/FullStack-Blogging-App
+[197/199] ERR    0 patchable /    0 nodes  andrewlock/blog-examples
+[198/199] ok     1 patchable /    4 nodes  yegor256/blog
+[199/199] ok   155 patchable /  241 nodes  ploeh/ploeh.github.com

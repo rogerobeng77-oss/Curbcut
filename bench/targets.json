@@ -1,0 +1,1196 @@
+[
+ {
+  "repo": "knative/docs",
+  "url": "https://knative.dev/docs/",
+  "stars": 5081,
+  "description": "User documentation for Knative components."
+ },
+ {
+  "repo": "pantheon-systems/documentation",
+  "url": "https://docs.pantheon.io",
+  "stars": 207,
+  "description": "Pantheon Docs"
+ },
+ {
+  "repo": "MicrosoftDocs/pipelines-dotnet-core",
+  "url": "https://microsoftdocs.github.io/pipelines-dotnet-core/",
+  "stars": 284,
+  "description": "A simple ASP.NET Core MVC app for Azure Pipelines docs"
+ },
+ {
+  "repo": "fastlane/docs",
+  "url": "https://docs.fastlane.tools",
+  "stars": 338,
+  "description": "All the fastlane docs"
+ },
+ {
+  "repo": "Azure-Samples/html-docs-hello-world",
+  "url": "https://azure-samples.github.io/html-docs-hello-world/",
+  "stars": 74,
+  "description": "A simple HTML site for docs"
+ },
+ {
+  "repo": "Polymer/old-docs-site",
+  "url": "https://www.polymer-project.org",
+  "stars": 1014,
+  "description": "Old Polymer site. Replaced by these repos: polymer-project.org, polymer-library-docs"
+ },
+ {
+  "repo": "superfly/docs",
+  "url": "https://superfly.github.io/docs/",
+  "stars": 127,
+  "description": ""
+ },
+ {
+  "repo": "pulumi/docs",
+  "url": "https://pulumi.com",
+  "stars": 178,
+  "description": "All things Pulumi docs!"
+ },
+ {
+  "repo": "ionic-team/ionic-docs",
+  "url": "https://ionicframework.com/docs",
+  "stars": 621,
+  "description": ""
+ },
+ {
+  "repo": "SeleniumHQ/www.seleniumhq.org",
+  "url": "https://seleniumhq.github.io/www.seleniumhq.org/",
+  "stars": 180,
+  "description": "Old Selenium website and docs (deprecated)"
+ },
+ {
+  "repo": "MinecraftForge/Documentation",
+  "url": "https://minecraftforge.github.io/Documentation/",
+  "stars": 513,
+  "description": "Read the docs MinecraftForge documentation"
+ },
+ {
+  "repo": "Kucoin/kucoin-api-docs",
+  "url": "https://kucoin.github.io/kucoin-api-docs/",
+  "stars": 272,
+  "description": "KuCoin API Docs"
+ },
+ {
+  "repo": "phalcon-orphanage/docs",
+  "url": "https://docs.phalcon.io",
+  "stars": 314,
+  "description": "Phalcon Framework documentation"
+ },
+ {
+  "repo": "gohugoio/hugoDocs",
+  "url": "https://gohugoio.github.io/hugoDocs/",
+  "stars": 1160,
+  "description": "The source for https://gohugo.io/"
+ },
+ {
+  "repo": "cockroachdb/docs",
+  "url": "https://cockroachlabs.com/docs",
+  "stars": 212,
+  "description": "CockroachDB user documentation"
+ },
+ {
+  "repo": "openshift/openshift-docs",
+  "url": "https://docs.openshift.com",
+  "stars": 878,
+  "description": "OpenShift 3 and 4 product and community documentation"
+ },
+ {
+  "repo": "ovh/docs",
+  "url": "https://help.ovhcloud.com/csm/en-gb-documentation?id=kb_home",
+  "stars": 272,
+  "description": "Official repository containing all docs & guides of OVH Group"
+ },
+ {
+  "repo": "platformsh/platformsh-docs",
+  "url": "https://docs.platform.sh/",
+  "stars": 114,
+  "description": "Platform.sh documentation. Templates available at https://github.com/platformsh-templates/"
+ },
+ {
+  "repo": "fullcalendar/fullcalendar-docs",
+  "url": "https://fullcalendar.io",
+  "stars": 142,
+  "description": "Static content for fullcalendar.io"
+ },
+ {
+  "repo": "travis-ci/docs-travis-ci-com",
+  "url": "http://docs.travis-ci.com",
+  "stars": 644,
+  "description": "The Travis CI Documentation"
+ },
+ {
+  "repo": "UniversalDependencies/docs",
+  "url": "http://universaldependencies.org/",
+  "stars": 297,
+  "description": "Universal Dependencies online documentation"
+ },
+ {
+  "repo": "AsahiLinux/docs",
+  "url": "http://asahilinux.org/docs/",
+  "stars": 2257,
+  "description": "Asahi Linux documentation"
+ },
+ {
+  "repo": "mdn/webaudio-examples",
+  "url": "https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API",
+  "stars": 1432,
+  "description": "Code examples that accompany the MDN Web Docs pages relating to Web Audio."
+ },
+ {
+  "repo": "pi-hole/docs",
+  "url": "https://docs.pi-hole.net/",
+  "stars": 283,
+  "description": "The official Pi-hole documentation"
+ },
+ {
+  "repo": "neo-project/docs",
+  "url": "http://docs.neo.org",
+  "stars": 193,
+  "description": "NEO Documentation"
+ },
+ {
+  "repo": "cloudfoundry/docs-bosh",
+  "url": "https://cloudfoundry.github.io/docs-bosh/",
+  "stars": 37,
+  "description": "The docs repo for BOSH"
+ },
+ {
+  "repo": "monome/docs",
+  "url": "https://monome.org/docs",
+  "stars": 142,
+  "description": "monome.org/docs"
+ },
+ {
+  "repo": "nette/docs",
+  "url": "https://nette.org/en/writing",
+  "stars": 122,
+  "description": "\ud83d\udcd6 The Nette documentation"
+ },
+ {
+  "repo": "MicrosoftDocs/pipelines-dotnet-core-docker",
+  "url": "https://microsoftdocs.github.io/pipelines-dotnet-core-docker/",
+  "stars": 44,
+  "description": "Sample .NET core Docker app for Azure Pipelines docs"
+ },
+ {
+  "repo": "fuel/docs",
+  "url": "http://fuelphp.com/docs",
+  "stars": 167,
+  "description": "Fuel PHP Framework - Fuel v1.x documentation"
+ },
+ {
+  "repo": "revel/revel.github.io",
+  "url": "https://revel.github.io",
+  "stars": 48,
+  "description": "Revel manual and docs"
+ },
+ {
+  "repo": "thirdweb-dev/docs",
+  "url": "https://docs.thirdweb.com",
+  "stars": 32,
+  "description": "thirdweb docs portal"
+ },
+ {
+  "repo": "scala/docs.scala-lang",
+  "url": "http://docs.scala-lang.org",
+  "stars": 575,
+  "description": "The Scala Documentation website"
+ },
+ {
+  "repo": "inveniosoftware/docs-invenio-rdm",
+  "url": "https://inveniordm.docs.cern.ch/",
+  "stars": 55,
+  "description": "InvenioRDM docs"
+ },
+ {
+  "repo": "localstack/docs",
+  "url": "https://docs.localstack.cloud",
+  "stars": 70,
+  "description": "Our docs have moved to a new repo: github.com/localstack/localstack-docs."
+ },
+ {
+  "repo": "reetasingh/CKAD-Bookmarks",
+  "url": "https://reetasingh.github.io/CKAD-Bookmarks/",
+  "stars": 295,
+  "description": "save time in searching docs in CKAD exam"
+ },
+ {
+  "repo": "cs50/docs",
+  "url": "https://cs50.harvard.edu/",
+  "stars": 331,
+  "description": "These are CS50 documents."
+ },
+ {
+  "repo": "splunk/public-o11y-docs",
+  "url": "https://docs.splunk.com/Observability/",
+  "stars": 25,
+  "description": "Splunk Observability Cloud docs"
+ },
+ {
+  "repo": "SeleniumHQ/docs",
+  "url": "https://seleniumhq.github.io/docs",
+  "stars": 123,
+  "description": "Project to rewrite the Selenium documentation."
+ },
+ {
+  "repo": "GoogleChrome/multi-device",
+  "url": "https://googlechrome.github.io/multi-device/",
+  "stars": 104,
+  "description": "Chrome multi-device (mobile) docs"
+ },
+ {
+  "repo": "codewithsadee/vcard-personal-portfolio",
+  "url": "https://codewithsadee.github.io/vcard-personal-portfolio/",
+  "stars": 8059,
+  "description": "vCard is a fully responsive personal portfolio website, responsive for all devices."
+ },
+ {
+  "repo": "evanca/quick-portfolio",
+  "url": "https://evanca.github.io/quick-portfolio/",
+  "stars": 597,
+  "description": "[DISCONTINUED] Use this template if you need a quick developer / data science portfolio! B"
+ },
+ {
+  "repo": "varadbhogayata/varadbhogayata.github.io",
+  "url": "https://varadbhogayata.github.io/",
+  "stars": 1528,
+  "description": "My Portfolio - Personal Website"
+ },
+ {
+  "repo": "rajaprerak/rajaprerak.github.io",
+  "url": "https://rajaprerak.github.io",
+  "stars": 1203,
+  "description": "Personal Portfolio Website"
+ },
+ {
+  "repo": "mmistakes/minimal-mistakes",
+  "url": "https://mmistakes.github.io/minimal-mistakes/",
+  "stars": 13558,
+  "description": ":triangular_ruler: Jekyll theme for building a personal site, blog, project documentation,"
+ },
+ {
+  "repo": "smaranjitghose/awesome-portfolio-websites",
+  "url": "https://portfolio.smaranjitghose.com/",
+  "stars": 2776,
+  "description": "A community maintained open source project aimed at making a personal portfolio for resear"
+ },
+ {
+  "repo": "thecodedealer/JS_CSS_PortfolioProject",
+  "url": "https://thecodedealer.github.io/JS_CSS_PortfolioProject/",
+  "stars": 674,
+  "description": ""
+ },
+ {
+  "repo": "helfi92/studorlio",
+  "url": "https://helfi92.github.io/studorlio/",
+  "stars": 317,
+  "description": "Portfolio website template"
+ },
+ {
+  "repo": "rammcodes/Dopefolio",
+  "url": "https://dopefolio.netlify.app",
+  "stars": 3742,
+  "description": "Dopefolio \ud83d\udd25 - Portfolio Template for Developers \ud83d\ude80"
+ },
+ {
+  "repo": "hugo-themes/toha",
+  "url": "https://toha-preview.hugo-themes.com",
+  "stars": 1246,
+  "description": "A Hugo theme for personal portfolio"
+ },
+ {
+  "repo": "fireship-io/threejs-scroll-animation-demo",
+  "url": "https://fireship-io.github.io/threejs-scroll-animation-demo/",
+  "stars": 1663,
+  "description": "3D Scrolling Portfolio Website with Three.js"
+ },
+ {
+  "repo": "akashyap2013/PortFolio_Website",
+  "url": "https://akashyap2013.github.io/PortFolio_Website/",
+  "stars": 839,
+  "description": "Complete Portfolio Website with Bootstrap - HTML/CSS In this project, we are going to lear"
+ },
+ {
+  "repo": "iuricode/portfolio",
+  "url": "https://www.iuricode.com",
+  "stars": 838,
+  "description": "Meu portfolio pessoal \u2764\ufe0f"
+ },
+ {
+  "repo": "sandhikagalih/sandhikagalih.github.io",
+  "url": "https://sandhikagalih.github.io/sandhikagalih.github.io/",
+  "stars": 283,
+  "description": "My Portfolio Website"
+ },
+ {
+  "repo": "giotsere/minimalist-portfolio",
+  "url": "https://giotsere.github.io/minimalist-portfolio/",
+  "stars": 479,
+  "description": "A simple minimalist one page portfolio. Link:"
+ },
+ {
+  "repo": "elidianaandrade/dio-lab-portfolio",
+  "url": "https://elidianaandrade.github.io/dio-lab-portfolio/",
+  "stars": 435,
+  "description": "Reposit\u00f3rio do lab Construindo seu Portf\u00f3lio Front-end do Zero da Digital Innovation One."
+ },
+ {
+  "repo": "CommunityPro/portfolio-html",
+  "url": "https://cpro-portfolio-html.netlify.app",
+  "stars": 674,
+  "description": "\ud83c\udf0d Open source portfolio template built with plain Html, CSS and JavaScript for developers "
+ },
+ {
+  "repo": "avinash201199/Portfolio-Collection",
+  "url": "https://portfolio-collection-five.vercel.app/",
+  "stars": 596,
+  "description": "This repository contains collection of portfolio's ."
+ },
+ {
+  "repo": "crearo/portfolio",
+  "url": "https://crearo.github.io/portfolio/",
+  "stars": 175,
+  "description": "My personal website - coded using python flask"
+ },
+ {
+  "repo": "thedevslot/WhatATheme",
+  "url": "https://thedevslot.github.io/WhatATheme/",
+  "stars": 328,
+  "description": "A customizable Jekyll Portfolio theme which supports blogging."
+ },
+ {
+  "repo": "dennisivy/portfolio-website",
+  "url": "https://dennisivy.github.io/portfolio-website/",
+  "stars": 358,
+  "description": ""
+ },
+ {
+  "repo": "jordanhudgens/portfolio-html-site",
+  "url": "https://jordanhudgens.github.io/portfolio-html-site/",
+  "stars": 255,
+  "description": ""
+ },
+ {
+  "repo": "ishandeveloper/Portfolio",
+  "url": "https://ishandeveloper.com/Portfolio/",
+  "stars": 199,
+  "description": "A fully responsive progressive web app that I'm currently working on which will contain an"
+ },
+ {
+  "repo": "yousinix/portfolYOU",
+  "url": "https://yousinix.github.io/portfolYOU",
+  "stars": 1164,
+  "description": "A beautiful portfolio Jekyll theme that works with GitHub Pages."
+ },
+ {
+  "repo": "website-templates/portfolio_one-page-template",
+  "url": "http://website-templates.github.io/portfolio_one-page-template/",
+  "stars": 261,
+  "description": "Free responsive one page portfolio template"
+ },
+ {
+  "repo": "S44WN/hailee-portfolio-website",
+  "url": "https://hailee.netlify.app/",
+  "stars": 197,
+  "description": "Portfolio Website "
+ },
+ {
+  "repo": "JoaoFranco03/photography-portfolio",
+  "url": "https://photography-portfolio-joaofranco03.netlify.app/",
+  "stars": 468,
+  "description": "\ud83d\udcf7 A Website created using Tailwind CSS, HTML, CSS and JavaScript that can be used as a Pho"
+ },
+ {
+  "repo": "bmorelli25/portfolio-template",
+  "url": "https://bmorelli25.github.io/portfolio-template/",
+  "stars": 340,
+  "description": "A Web Developer Portfolio Template"
+ },
+ {
+  "repo": "Ade-mir/html-css-js-portfolio-tutorial-2",
+  "url": "https://ade-mir.github.io/html-css-js-portfolio-tutorial-2/",
+  "stars": 605,
+  "description": ""
+ },
+ {
+  "repo": "alisolanki/Portfolio",
+  "url": "https://alisolanki.github.io/Portfolio/",
+  "stars": 85,
+  "description": "My portfolio website using basic html css."
+ },
+ {
+  "repo": "themefisher/kross-jekyll",
+  "url": "https://themefisher.com/products/kross-jekyll",
+  "stars": 248,
+  "description": "Kross is creative portfolio theme for Jekyll."
+ },
+ {
+  "repo": "portfolio-central/jekyll-instagram-portfolio-theme",
+  "url": "https://portfolio-central.github.io/jekyll-instagram-portfolio-theme/",
+  "stars": 70,
+  "description": "Jekyll Instagram Portfolio Theme"
+ },
+ {
+  "repo": "longpdo/neumorphism",
+  "url": "https://longpdo.github.io/neumorphism/",
+  "stars": 476,
+  "description": "      Neumorphism designed Jekyll theme for personal websites, portfolios and resumes."
+ },
+ {
+  "repo": "Ksound22/developer-portfolio",
+  "url": "https://ksound22.github.io/developer-portfolio/",
+  "stars": 179,
+  "description": "Portfolio website tutorial for freeCodeCamp readers"
+ },
+ {
+  "repo": "codrops/SegmentEffect",
+  "url": "https://codrops.github.io/SegmentEffect/",
+  "stars": 540,
+  "description": "Background image segment effect as seen on [Filippo Bello's Portfolio](http://www.filippob"
+ },
+ {
+  "repo": "femascheti/portfolio-de-projetos",
+  "url": "https://femascheti.github.io/portfolio-de-projetos/",
+  "stars": 6,
+  "description": ""
+ },
+ {
+  "repo": "SampurnaC/portfolio_website_fcc",
+  "url": "https://sampurnac.github.io/portfolio_website_fcc/",
+  "stars": 150,
+  "description": ""
+ },
+ {
+  "repo": "volny/stylish-portfolio-jekyll",
+  "url": "https://volny.github.io/stylish-portfolio-jekyll/",
+  "stars": 235,
+  "description": "A Jekyll implementation of the Stylish Portfolio template by Start Bootstrap"
+ },
+ {
+  "repo": "alphagov/accessibility-tool-audit",
+  "url": "https://alphagov.github.io/accessibility-tool-audit/",
+  "stars": 89,
+  "description": "Automated accessibility tools audit"
+ },
+ {
+  "repo": "themefisher/airspace-hugo",
+  "url": "https://gethugothemes.com/products/airspace/?utm_source=airspace_github&utm_medium=referral&utm_campaign=github_theme_about",
+  "stars": 373,
+  "description": "Airspace Hugo theme for multipurpose use, like Portfolio, Blog, Business."
+ },
+ {
+  "repo": "WebAssembly/website",
+  "url": "https://webassembly.org",
+  "stars": 286,
+  "description": "WebAssembly website"
+ },
+ {
+  "repo": "tektoncd/website",
+  "url": "https://tekton.dev",
+  "stars": 69,
+  "description": "Tekton Website"
+ },
+ {
+  "repo": "phalcon/website",
+  "url": "https://phalcon.io/",
+  "stars": 111,
+  "description": "Archived Website repository - https://github.com/phalcon/phalcon.io"
+ },
+ {
+  "repo": "microsoft/SmartHotel360-Website",
+  "url": "https://microsoft.github.io/SmartHotel360-Website/",
+  "stars": 216,
+  "description": "SmartHotel360 Webiste"
+ },
+ {
+  "repo": "bedimcode/responsive-portfolio-website-Alexa",
+  "url": "https://youtu.be/27JtRAI3QO8",
+  "stars": 2665,
+  "description": "Responsive Portfolio Website Using HTML, CSS & JavaScript"
+ },
+ {
+  "repo": "spring-ai-alibaba/website",
+  "url": "https://java2ai.com",
+  "stars": 69,
+  "description": "Source code of Spring AI Alibaba official website. \ud83d\udcda"
+ },
+ {
+  "repo": "apache/dubbo-website",
+  "url": "https://dubbo.apache.org/",
+  "stars": 492,
+  "description": "Apache Dubbo documents"
+ },
+ {
+  "repo": "developedbyed/glass-website",
+  "url": "https://developedbyed.github.io/glass-website/",
+  "stars": 921,
+  "description": ""
+ },
+ {
+  "repo": "linuxkerneltravel/website",
+  "url": "http://kerneltravel.net/",
+  "stars": 147,
+  "description": "Linux\u5185\u6838\u4e4b\u65c5\u5f00\u6e90\u793e\u533a\u7f51\u7ad9"
+ },
+ {
+  "repo": "designmodo/html-website-templates",
+  "url": "https://designmodo.github.io/html-website-templates/",
+  "stars": 951,
+  "description": "Free static HTML website templates created using the Slides - https://designmodo.com/slide"
+ },
+ {
+  "repo": "Pi-Apps-Coders/website",
+  "url": "https://pi-apps.io",
+  "stars": 13,
+  "description": "Pi-Apps project website"
+ },
+ {
+  "repo": "sharecuts/website",
+  "url": "https://sharecuts.github.io/website/",
+  "stars": 422,
+  "description": "A public repository of shortcuts for the Shortcuts app"
+ },
+ {
+  "repo": "akashyap2013/Blooger_Website",
+  "url": "https://akashyap2013.github.io/Blooger_Website/",
+  "stars": 412,
+  "description": "This is the complete blooger website create using html and css"
+ },
+ {
+  "repo": "jigar-sable/Portfolio-Website",
+  "url": "https://jigarsable.netlify.app/",
+  "stars": 720,
+  "description": "Portfolio Website built using HTML5, CSS3, JavaScript and jQuery"
+ },
+ {
+  "repo": "servicemesher/website",
+  "url": "https://servicemesher.github.io/website/",
+  "stars": 62,
+  "description": "ServiceMesher community website - https://www.servicemesher.com"
+ },
+ {
+  "repo": "ReChronoRain/website",
+  "url": "https://hyperceiler.sevtinge.com",
+  "stars": 16,
+  "description": "HyperCeiler/Cemiuiler Official Website"
+ },
+ {
+  "repo": "EvilInsultGenerator/website",
+  "url": "https://evilinsult.com/",
+  "stars": 111,
+  "description": "Evil Insult Generator Website"
+ },
+ {
+  "repo": "developer-portal/website",
+  "url": "https://developer.fedoraproject.org/",
+  "stars": 45,
+  "description": " Jekyll templates, CSS styles and images for the Fedora Developer Portal."
+ },
+ {
+  "repo": "cloudacademy/static-website-example",
+  "url": "https://cloudacademy.github.io/static-website-example/",
+  "stars": 98,
+  "description": "Static website to use with Cloud Academy labs"
+ },
+ {
+  "repo": "BuckyMaler/global",
+  "url": "http://buckymaler.com/global",
+  "stars": 1250,
+  "description": "HTML5 website template"
+ },
+ {
+  "repo": "OpenClassrooms-Student-Center/GameOn-website-FR",
+  "url": "https://openclassrooms-student-center.github.io/GameOn-website-FR/",
+  "stars": 56,
+  "description": "Code du projet 4 de d\u00e9veloppeur front-end V2"
+ },
+ {
+  "repo": "microsoft/project-html-website",
+  "url": "https://microsoft.github.io/project-html-website/",
+  "stars": 122,
+  "description": "Sample HTML+CSS+JS website"
+ },
+ {
+  "repo": "crimethinc/website",
+  "url": "https://crimethinc.com",
+  "stars": 110,
+  "description": "Ruby on Rails app that powers crimethinc.com"
+ },
+ {
+  "repo": "yeoman/yeoman.io",
+  "url": "http://yeoman.io",
+  "stars": 793,
+  "description": "Yeoman website"
+ },
+ {
+  "repo": "simple-login/website",
+  "url": "https://simple-login.github.io/website/",
+  "stars": 61,
+  "description": "SimpleLogin website - https://simplelogin.io"
+ },
+ {
+  "repo": "unstoppabledomains/decentralized-websites",
+  "url": "https://unstoppabledomains.github.io/decentralized-websites/",
+  "stars": 217,
+  "description": "Repository for resources on building decentralized websites"
+ },
+ {
+  "repo": "openssl/web",
+  "url": "https://openssl.github.io/web/",
+  "stars": 66,
+  "description": "www.openssl.org "
+ },
+ {
+  "repo": "meteor-vegas/website",
+  "url": "http://vegas.meteor.com",
+  "stars": 48,
+  "description": "Website for the Las Vegas Meteor Meetup Group"
+ },
+ {
+  "repo": "miniflux/website",
+  "url": "https://miniflux.app",
+  "stars": 14,
+  "description": "Miniflux's website"
+ },
+ {
+  "repo": "LukeSmithxyz/based.cooking",
+  "url": "https://lukesmithxyz.github.io/based.cooking/",
+  "stars": 2338,
+  "description": "A simple culinary website."
+ },
+ {
+  "repo": "freegate-release/website",
+  "url": "https://freegate-release.github.io/website/",
+  "stars": 106,
+  "description": ""
+ },
+ {
+  "repo": "verekia/initializr-website",
+  "url": "http://www.initializr.com",
+  "stars": 353,
+  "description": "Initializr Home Page"
+ },
+ {
+  "repo": "Neovenchy/Discord-bot-website-template",
+  "url": "https://neovenchy.github.io/Discord-bot-website-template/",
+  "stars": 452,
+  "description": "Amazing website designed with Bootstrap for new Discord bots."
+ },
+ {
+  "repo": "ShaifArfan/one-page-website-html-css-project",
+  "url": "https://shaifarfan.github.io/one-page-website-html-css-project/",
+  "stars": 699,
+  "description": "This project is for html & css practice. We made this for youtube tutorial purpose."
+ },
+ {
+  "repo": "OsProgramadores/op-website-hugo",
+  "url": "https://osprogramadores.github.io/op-website-hugo/",
+  "stars": 168,
+  "description": "Projeto do Site https://OsProgramadores.com"
+ },
+ {
+  "repo": "FreeRDP/freerdp.github.io",
+  "url": "https://freerdp.github.io/freerdp.github.io/",
+  "stars": 17,
+  "description": "FreeRDP website"
+ },
+ {
+  "repo": "neon-bindings/website",
+  "url": "https://neon-bindings.com",
+  "stars": 12,
+  "description": "The Neon website"
+ },
+ {
+  "repo": "serialport/website",
+  "url": "https://serialport.io/",
+  "stars": 41,
+  "description": "The website for the serialport project"
+ },
+ {
+  "repo": "TokTok/website",
+  "url": "https://toktok.ltd/",
+  "stars": 12,
+  "description": "The TokTok website"
+ },
+ {
+  "repo": "typora/theme.typora.io",
+  "url": "http://theme.typora.io",
+  "stars": 950,
+  "description": "Website for Typora themes"
+ },
+ {
+  "repo": "tailwindtoolbox/Landing-Page",
+  "url": "https://tailwindtoolbox.github.io/Landing-Page",
+  "stars": 1451,
+  "description": "Tailwind CSS Starter Template - Landing Page"
+ },
+ {
+  "repo": "flexdinesh/dev-landing-page",
+  "url": "https://flexdinesh.github.io/dev-landing-page/",
+  "stars": 1347,
+  "description": "Minimal landing page for developers"
+ },
+ {
+  "repo": "YaninaTrekhleb/restaurant-website",
+  "url": "https://yaninatrekhleb.github.io/restaurant-website/",
+  "stars": 295,
+  "description": "Restaurant Landing Page"
+ },
+ {
+  "repo": "PaulleDemon/awesome-landing-pages",
+  "url": "https://awesome-landingpages.vercel.app/",
+  "stars": 1030,
+  "description": "Free to use landing pages for SaaS founders, freelancers, agencies and businesses"
+ },
+ {
+  "repo": "joshbuchea/awesome-app-landing-page",
+  "url": "https://joshbuchea.github.io/awesome-app-landing-page/",
+  "stars": 288,
+  "description": "Get an awesome landing page for your iOS app in less than 30 seconds"
+ },
+ {
+  "repo": "kedacore/keda-docs",
+  "url": "https://keda.sh",
+  "stars": 154,
+  "description": "Documentation and landing page for KEDA"
+ },
+ {
+  "repo": "dmfeisal/simple-wedding-invitation",
+  "url": "https://simple-wedding-invitation.netlify.app/",
+  "stars": 289,
+  "description": "Wedding Invitation Landing Page "
+ },
+ {
+  "repo": "thecodercoder/fem-easybank",
+  "url": "https://thecodercoder.github.io/fem-easybank/",
+  "stars": 406,
+  "description": "Easybank landing page from Frontend Mentor"
+ },
+ {
+  "repo": "alexandresaints/landing-page-tutorial",
+  "url": "https://alexandresaints.github.io/landing-page-tutorial/",
+  "stars": 118,
+  "description": "Landing page i did for youtube's tutorial"
+ },
+ {
+  "repo": "adrienjoly/landing-page-boilerplate",
+  "url": "http://landing.adrienjoly.com/",
+  "stars": 154,
+  "description": "\ud83d\uddbc A pure client-side landing page template that you can fork, customize and host freely. R"
+ },
+ {
+  "repo": "mhaecal/skilline-landing-page",
+  "url": "https://mhaecal.github.io/frontend/skilline",
+  "stars": 247,
+  "description": "Free landing page template built on top of Tailwind CSS "
+ },
+ {
+  "repo": "zuramai/mazer",
+  "url": "http://zuramai.github.io/mazer",
+  "stars": 3099,
+  "description": "Free and Open-source Bootstrap 5 Admin Dashboard Template and Landing Page "
+ },
+ {
+  "repo": "tailwindtoolbox/Rainblur-Landing-Page",
+  "url": "https://tailwindtoolbox.github.io/Rainblur-Landing-Page/",
+  "stars": 259,
+  "description": "Tailwind CSS Starter Template - Rainblur Landing Page (dark)"
+ },
+ {
+  "repo": "breatheco-de/exercise-collaborative-html-website",
+  "url": "https://breatheco-de.github.io/exercise-collaborative-html-website/",
+  "stars": 41,
+  "description": "For teachers: Practice GIT with your students doing a landing page."
+ },
+ {
+  "repo": "izzydoesizzy/resumetemplate",
+  "url": "https://izzydoesizzy.github.io/resumetemplate/",
+  "stars": 210,
+  "description": "Creative: Personal website/landing page template."
+ },
+ {
+  "repo": "tailwindtoolbox/App-Landing-Page",
+  "url": "https://tailwindtoolbox.github.io/App-Landing-Page/",
+  "stars": 220,
+  "description": "Tailwind CSS Starter Template - App Landing Page"
+ },
+ {
+  "repo": "excentris/compass",
+  "url": "https://excentris.github.io/compass/",
+  "stars": 197,
+  "description": "The Jekyll theme for your personal landing page."
+ },
+ {
+  "repo": "bradtraversy/saas-landing-page",
+  "url": "https://bradtraversy.github.io/saas-landing-page/",
+  "stars": 132,
+  "description": "Simple landing page for a SaaS"
+ },
+ {
+  "repo": "MobileNativeFoundation/mobilenativefoundation.org",
+  "url": "https://mobilenativefoundation.org",
+  "stars": 72,
+  "description": "Landing page"
+ },
+ {
+  "repo": "udacity/cd0428-landing-page",
+  "url": "https://udacity.github.io/cd0428-landing-page/",
+  "stars": 8,
+  "description": "cd0428 Javascript & the DOM project repo."
+ },
+ {
+  "repo": "digitalinnovationone/trilha-css-desafio-01",
+  "url": "https://digitalinnovationone.github.io/trilha-css-desafio-01/",
+  "stars": 167,
+  "description": "Primeiro desafio da Trilha de CSS: construindo uma landing page do curso com HTML e CSS."
+ },
+ {
+  "repo": "sonic-net/SONiC",
+  "url": "https://sonic-net.github.io/SONiC/",
+  "stars": 2900,
+  "description": "Landing page for Software for Open Networking in the Cloud (SONiC) - https://sonic-net.git"
+ },
+ {
+  "repo": "0silverback0/LandingPages",
+  "url": "https://radiant-cucurucho-b049fa.netlify.app/",
+  "stars": 23,
+  "description": "\"Welcome to our Landing Page Creation Repository! Join us in crafting compelling landing p"
+ },
+ {
+  "repo": "tailwindtoolbox/Screenshot-Landing-Page",
+  "url": "https://tailwindtoolbox.github.io/Screenshot-Landing-Page",
+  "stars": 145,
+  "description": "Tailwind CSS Starter Template - Screenshot Landing Page"
+ },
+ {
+  "repo": "themesberg/landwind",
+  "url": "https://demo.themesberg.com/landwind/",
+  "stars": 1016,
+  "description": "Responsive and clean landing page built with Tailwind CSS and Flowbite"
+ },
+ {
+  "repo": "themesberg/tailwind-landing-page",
+  "url": "https://themesberg.github.io/tailwind-landing-page/",
+  "stars": 138,
+  "description": "A responsive landing page built with Tailwind CSS and Flowbite Blocks"
+ },
+ {
+  "repo": "tilt-dev/tilt.build",
+  "url": "https://tilt.dev/",
+  "stars": 24,
+  "description": "Tilt landing page"
+ },
+ {
+  "repo": "ttntm/hugo-landing-page",
+  "url": "https://awesome.ttntm.me",
+  "stars": 124,
+  "description": "A simple landing page built with Hugo and Tailwind CSS"
+ },
+ {
+  "repo": "JastinXyz/discord-bot-landing-page-web",
+  "url": "https://jastinxyz.github.io/discord-bot-landing-page-web",
+  "stars": 120,
+  "description": "Free Discord Bot Website Template Made With Bulma (landing page only)"
+ },
+ {
+  "repo": "CodeYourFuture/HTML-CSS-Module-Project",
+  "url": "https://codeyourfuture.github.io/HTML-CSS-Module-Project/",
+  "stars": 45,
+  "description": "Apply flexbox and grid as you recreate a simple landing page"
+ },
+ {
+  "repo": "ahmadsohail404/Netflix-UI-LandingPage",
+  "url": "https://ahmadsohail404.github.io/Netflix-UI-LandingPage/",
+  "stars": 13,
+  "description": ""
+ },
+ {
+  "repo": "Tailus-UI/ada-html",
+  "url": "https://ada.tailus.io/",
+  "stars": 155,
+  "description": "Modern html landing page built with tailus themer"
+ },
+ {
+  "repo": "Larissakich/landing-page-food-theme",
+  "url": "https://larissakich.github.io/landing-page-food-theme/",
+  "stars": 119,
+  "description": ""
+ },
+ {
+  "repo": "saroz/domain-for-sale",
+  "url": "https://saroz.github.io/domain-for-sale",
+  "stars": 96,
+  "description": "Domain For Sale Landing Page Free Template"
+ },
+ {
+  "repo": "praveenscience/Creative-Simple-Landing-Pages",
+  "url": "https://praveenscience.github.io/Creative-Simple-Landing-Pages/",
+  "stars": 39,
+  "description": "This is a Hacktoberfest Repository for Creative & Simple Landing Pages."
+ },
+ {
+  "repo": "bigspotteddog/landing-page-service",
+  "url": "https://bigspotteddog.github.io/landing-page-service/",
+  "stars": 249,
+  "description": ""
+ },
+ {
+  "repo": "OWASP/www-project-zap",
+  "url": "https://owasp.org/www-project-zap/",
+  "stars": 117,
+  "description": "OWASP Zed Attack Proxy project landing page."
+ },
+ {
+  "repo": "pranav07-git/Responsive-Landing-Page-Website",
+  "url": "https://pranavraj1720.github.io/Responsive-Landing-Page-Website/",
+  "stars": 51,
+  "description": "Complete Responsive Illustration Website Using HTML | CSS | JavaScript"
+ },
+ {
+  "repo": "luizomf/landing-page-cursojs",
+  "url": "https://luizomf.github.io/landing-page-cursojs/",
+  "stars": 63,
+  "description": ""
+ },
+ {
+  "repo": "codicts/Fashion-Landing-Page",
+  "url": "https://codicts.github.io/Fashion-Landing-Page/",
+  "stars": 49,
+  "description": ""
+ },
+ {
+  "repo": "digoal/blog",
+  "url": "https://github.com/digoal/blog/blob/master/README.md",
+  "stars": 8561,
+  "description": "Opensource,Database,AI,Business,Minds. git clone --depth 1 https://github.com/digoal/blog"
+ },
+ {
+  "repo": "qiubaiying/qiubaiying.github.io",
+  "url": "https://qiubaiying.github.io/",
+  "stars": 3315,
+  "description": "BY Blog ->"
+ },
+ {
+  "repo": "biaochenxuying/blog",
+  "url": "https://biaochenxuying.github.io/blog/",
+  "stars": 4774,
+  "description": "\u5927\u524d\u7aef\u6280\u672f\u4e3a\u4e3b\uff0c\u8bfb\u4e66\u7b14\u8bb0\u3001\u968f\u7b14\u3001\u7406\u8d22\u4e3a\u8f85\uff0c\u505a\u4e2a\u7ec8\u8eab\u5b66\u4e60\u8005\u3002"
+ },
+ {
+  "repo": "Huxpro/huxpro.github.io",
+  "url": "http://huangxuan.me",
+  "stars": 7610,
+  "description": "My Blog / Jekyll Themes / PWA"
+ },
+ {
+  "repo": "eddycjy/blog",
+  "url": "https://eddycjy.github.io/blog/",
+  "stars": 3055,
+  "description": "\u714e\u9c7c\u7684\u535a\u5ba2\uff0c\u6709\u70b9\u5fd9\uff0c\u4f20\u9001\u95e8\uff1ahttps://eddycjy.com"
+ },
+ {
+  "repo": "yangkun19921001/Blog",
+  "url": "https://github.com/yangkun19921001/AVSample",
+  "stars": 2116,
+  "description": "Android \u9762\u8bd5\u5b9d\u5178\u3001\u6570\u636e\u7ed3\u6784\u548c\u7b97\u6cd5\u3001\u97f3\u89c6\u9891 (FFmpeg\u3001AAC\u3001x264\u3001MediaCodec)\u3001 C/C++ \u3001OpenCV\u3001\u8de8\u5e73\u53f0\u7b49\u5b66\u4e60\u8bb0\u5f55\u3002\u30100\u57fa\u7840\u97f3\u89c6\u9891\u8fdb\u9636\u5b66\u4e60\u8def"
+ },
+ {
+  "repo": "phil-opp/blog_os",
+  "url": "http://os.phil-opp.com",
+  "stars": 17681,
+  "description": "Writing an OS in Rust"
+ },
+ {
+  "repo": "xy-sea/blog",
+  "url": "https://xy-sea.github.io/blog/",
+  "stars": 745,
+  "description": "\u535a\u5ba2\uff1a\u524d\u7aef\u77e5\u8bc6\u4f53\u7cfb\u3001\u524d\u7aef\u76d1\u63a7\u3001\u6027\u80fd\u4f18\u5316\u3001\u539f\u7406\u63a2\u7d22\u3001\u9762\u7ecf\u7b49"
+ },
+ {
+  "repo": "StartBootstrap/startbootstrap-clean-blog-jekyll",
+  "url": "https://startbootstrap.com/themes/clean-blog-jekyll/",
+  "stars": 2130,
+  "description": "A Jekyll version of the Clean Blog theme by Start Bootstrap"
+ },
+ {
+  "repo": "xieranmaya/blog",
+  "url": "https://xieranmaya.github.io/blog/",
+  "stars": 1705,
+  "description": "My blog."
+ },
+ {
+  "repo": "atian25/blog",
+  "url": "https://atian25.github.io/blog/",
+  "stars": 1582,
+  "description": "\u5929\u732a\u90e8\u843d\u9601  http://atian25.github.io"
+ },
+ {
+  "repo": "joeyguo/blog",
+  "url": "https://github.com/joeyguo/blog",
+  "stars": 1283,
+  "description": "joeyguo's blog  \u8bf7 Watch \u6216 Star"
+ },
+ {
+  "repo": "luizdepra/hugo-coder",
+  "url": "https://luizdepra.github.io/hugo-coder/",
+  "stars": 3105,
+  "description": "A minimalist blog theme for hugo."
+ },
+ {
+  "repo": "udacity/course-git-blog-project",
+  "url": "https://udacity.github.io/course-git-blog-project/",
+  "stars": 174,
+  "description": "Sample repo of a blog for the Git course"
+ },
+ {
+  "repo": "ccforward/cc",
+  "url": "https://ccforward.github.io/cc/",
+  "stars": 1574,
+  "description": "Code & Blog"
+ },
+ {
+  "repo": "freddier/hyperblog",
+  "url": "https://freddier.github.io/hyperblog/",
+  "stars": 8787,
+  "description": "Un blog incre\u00edble para el curso de Git y Github de Platzi"
+ },
+ {
+  "repo": "peterroelants/peterroelants.github.io",
+  "url": "http://peterroelants.github.io/",
+  "stars": 349,
+  "description": "Blog"
+ },
+ {
+  "repo": "vbuterin/blog",
+  "url": "https://vbuterin.github.io/blog/",
+  "stars": 234,
+  "description": ""
+ },
+ {
+  "repo": "nunocoracao/blowfish",
+  "url": "https://blowfish.page",
+  "stars": 2878,
+  "description": "Personal Website & Blog Theme for Hugo"
+ },
+ {
+  "repo": "wintercn/blog",
+  "url": "https://wintercn.github.io/blog/",
+  "stars": 581,
+  "description": ""
+ },
+ {
+  "repo": "Huxpro/huxblog-boilerplate",
+  "url": "https://huxpro.github.io/huxblog-boilerplate/",
+  "stars": 410,
+  "description": "Boilerplate of Hux Blog"
+ },
+ {
+  "repo": "twbs/blog",
+  "url": "https://blog.getbootstrap.com",
+  "stars": 274,
+  "description": "Official blog for Bootstrap."
+ },
+ {
+  "repo": "pnp/blog",
+  "url": "https://pnp.github.io/blog",
+  "stars": 119,
+  "description": "Holds all blogs published on the Microsoft 365 & Power Platform Community blog"
+ },
+ {
+  "repo": "youerning/blog",
+  "url": "https://youerning.top",
+  "stars": 200,
+  "description": "\u6587\u7ae0\u5217\u8868"
+ },
+ {
+  "repo": "mojombo/mojombo.github.io",
+  "url": "http://tom.preston-werner.com",
+  "stars": 945,
+  "description": "Jekyll source for my personal blog."
+ },
+ {
+  "repo": "rust-lang/blog.rust-lang.org",
+  "url": "https://blog.rust-lang.org",
+  "stars": 414,
+  "description": "Home of the Rust and Inside Rust blogs"
+ },
+ {
+  "repo": "chemdemo/chemdemo.github.io",
+  "url": "https://chemdemo.github.io/chemdemo.github.io/",
+  "stars": 1002,
+  "description": "dmyang blog"
+ },
+ {
+  "repo": "ifwenvlook/blog",
+  "url": "http://www.vlblog.tech/",
+  "stars": 248,
+  "description": "A simple blog system based on Flask"
+ },
+ {
+  "repo": "petrkeil/Blog",
+  "url": "https://petrkeil.github.io/Blog/",
+  "stars": 85,
+  "description": "This repository contains codes for all of my blog posts since March 11 2015."
+ },
+ {
+  "repo": "mvaneerde/blog",
+  "url": "https://matthewvaneerde.wordpress.com/",
+  "stars": 208,
+  "description": "Matthew van Eerde's blog"
+ },
+ {
+  "repo": "barretlee/blogChat",
+  "url": "http://www.barretlee.com/",
+  "stars": 498,
+  "description": "Chat room source code for Barret Lee's Personal Blog."
+ },
+ {
+  "repo": "andrewlock/blog-examples",
+  "url": "https://andrewlock.github.io/blog-examples/",
+  "stars": 405,
+  "description": "Sample applications for blog posts on https://andrewlock.net"
+ },
+ {
+  "repo": "justjavac/justjavac.github.com",
+  "url": "https://justjavac.com",
+  "stars": 607,
+  "description": "\ud83c\udde8\ud83c\uddf3\u4e2a\u4eba\u535a\u5ba2\uff0c\u559c\u6b22\u7684\u8bdd\u8bf7\u70b9 star\uff0c\u60f3\u8ba2\u9605\u70b9 watch :sparkles: "
+ },
+ {
+  "repo": "Pines-Cheng/blog",
+  "url": "https://pines-cheng.github.io/blog/",
+  "stars": 561,
+  "description": "\u6280\u672f\u535a\u5ba2"
+ },
+ {
+  "repo": "mode/blog",
+  "url": "https://mode.github.io/blog/",
+  "stars": 122,
+  "description": "Data, code, and scripts for the analysis in the Mode blog."
+ },
+ {
+  "repo": "ploeh/ploeh.github.com",
+  "url": "https://ploeh.github.io/ploeh.github.com/",
+  "stars": 140,
+  "description": "ploeh blog 'source code'"
+ },
+ {
+  "repo": "yegor256/blog",
+  "url": "https://www.yegor256.com",
+  "stars": 126,
+  "description": "My blog about computers, written in Jekyll and deployed to GitHub Pages"
+ },
+ {
+  "repo": "NVIDIA-developer-blog/code-samples",
+  "url": "https://nvidia-developer-blog.github.io/code-samples/",
+  "stars": 1331,
+  "description": "Source code examples from the Parallel Forall Blog"
+ },
+ {
+  "repo": "jaiswaladi246/FullStack-Blogging-App",
+  "url": "https://jaiswaladi246.github.io/FullStack-Blogging-App/",
+  "stars": 118,
+  "description": ""
+ }
+]
