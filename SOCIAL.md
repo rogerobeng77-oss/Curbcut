@@ -1,4 +1,4 @@
-# Social posts — a11y-agent
+# Social posts — Curbcut
 
 ## X (under 280 characters)
 

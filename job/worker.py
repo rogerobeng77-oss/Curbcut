@@ -298,8 +298,8 @@ def main() -> None:
                 # write this job's container does not own.
                 _run_git(
                     ["git", "-C", workdir,
-                     "-c", "user.name=a11y-agent",
-                     "-c", "user.email=a11y-agent@users.noreply.github.com",
+                     "-c", "user.name=curbcut",
+                     "-c", "user.email=curbcut@users.noreply.github.com",
                      "commit", "-am",
                      f"fix: {len(result.verified)} verified accessibility violation(s)"],
                     token,

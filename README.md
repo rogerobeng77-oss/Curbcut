@@ -1,6 +1,6 @@
-# a11y-agent
+# Curbcut
 
-An agent that watches a GitHub repository for pull requests, renders each
+Curbcut is an agent that watches a GitHub repository for pull requests, renders each
 page, finds WCAG accessibility violations with axe-core, writes a real
 source patch for each one it can, and then **proves the patch worked** by
 re-rendering and re-scanning before it ever reaches a human. Only patches
@@ -73,7 +73,7 @@ Vertex AI, and Cloud Trace enabled, and `gcloud` authenticated against it.
 ### 1. Clone and install
 
 ```bash
-git clone <this-repo-url> a11y-agent && cd a11y-agent
+git clone <this-repo-url> curbcut && cd curbcut
 uv pip install -e ".[dev]"
 uv run playwright install --with-deps chromium
 ```
