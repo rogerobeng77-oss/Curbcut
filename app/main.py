@@ -1,7 +1,9 @@
+import hashlib
 import os
+from pathlib import Path
 
 from fastapi import HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExportResult
 
@@ -90,9 +92,37 @@ def get_audit(run_id: str):
     return store.audit_trail(run_id)
 
 
+def _asset_version() -> str:
+    """A short digest of the console's own CSS and JS.
+
+    StaticFiles sends Last-Modified and an ETag but no Cache-Control, so a
+    browser falls back to heuristic freshness and can serve a cached
+    stylesheet for a good while after a deploy. Rather than defeat caching,
+    change the URL when the bytes change: the query string is part of the
+    cache key, so a new deploy is a new asset and an unchanged one still
+    comes from disk.
+    """
+    digest = hashlib.sha256()
+    for name in ("console.css", "console.js"):
+        digest.update(Path("web", name).read_bytes())
+    return digest.hexdigest()[:12]
+
+
+ASSET_VERSION = _asset_version()
+
+
 @app.get("/")
 def console():
-    return FileResponse("web/index.html")
+    """The console shell, with its asset links stamped with the build digest.
+
+    Served as HTML rather than FileResponse so the version can be injected,
+    and marked no-cache so this one small document is always revalidated --
+    it is what carries the pointer to everything else.
+    """
+    html = Path("web/index.html").read_text()
+    html = html.replace("/static/console.css", f"/static/console.css?v={ASSET_VERSION}")
+    html = html.replace("/static/console.js", f"/static/console.js?v={ASSET_VERSION}")
+    return HTMLResponse(html, headers={"Cache-Control": "no-cache"})
 
 
 app.mount("/static", StaticFiles(directory="web"), name="static")

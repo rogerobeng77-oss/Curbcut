@@ -58,3 +58,38 @@ def test_run_record_surfaces_the_new_runresult_fields():
     assert body["reappeared"] == 1
     assert body["unreverted"] == 1
     assert body["dropped_audit"] == 2
+
+
+def test_console_stamps_assets_with_a_version_and_does_not_cache_the_shell():
+    """A deploy must not leave browsers on the previous stylesheet.
+
+    StaticFiles sends no Cache-Control, so without a changing URL a browser
+    can serve a cached console.css well past a deploy. The shell itself is
+    marked no-cache because it carries the pointer to everything else.
+    """
+    from fastapi.testclient import TestClient
+    from app.main import app, ASSET_VERSION
+
+    response = TestClient(app).get("/")
+
+    assert response.status_code == 200
+    assert response.headers["cache-control"] == "no-cache"
+    assert f"/static/console.css?v={ASSET_VERSION}" in response.text
+    assert f"/static/console.js?v={ASSET_VERSION}" in response.text
+    assert len(ASSET_VERSION) == 12
+
+
+def test_asset_version_changes_when_the_css_changes(tmp_path, monkeypatch):
+    """The digest has to be of the bytes, not of anything incidental."""
+    from app.main import _asset_version
+    import app.main as main
+
+    before = _asset_version()
+    css = main.Path("web/console.css")
+    original = css.read_bytes()
+    try:
+        css.write_bytes(original + b"\n/* touched */\n")
+        assert _asset_version() != before
+    finally:
+        css.write_bytes(original)
+    assert _asset_version() == before
