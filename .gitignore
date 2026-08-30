@@ -17,3 +17,6 @@ DEMO_STEPS.md
 # LibreOffice lock files, and the deck itself (submission scaffolding)
 .~lock.*#
 curbcut-intro.pptx
+
+# draw.io source for the architecture diagram
+curbcut-architecture.drawio
