@@ -84,3 +84,29 @@ def test_returns_none_for_exotic_line_separators():
     for separator in ("\r", "\u2028", "\x0b", "\x85"):
         reply = _reply(new=f'  <img src="logo.png">{separator}  <p>x</p>')
         assert propose_patch(FakeModel([reply]), VIOLATION, MATCH, b"p") is None, separator
+
+
+def test_propose_patch_requests_json_mode():
+    """The schema must reach the model, not just sit in a constant.
+
+    Without it the adapter falls back to free-form text, which is exactly the
+    failure this was written to close: three of seven patches rejected as
+    `not_json` in a real run against an unchanged fixture.
+    """
+    from app.patcher import PATCH_SCHEMA, propose_patch
+    from app.scanner import Violation
+    from app.locator import SourceMatch
+    from substrate.fakes import FakeModel
+
+    model = FakeModel(['{"old": "<img src=\\"a.png\\">", '
+                       '"new": "<img src=\\"a.png\\" alt=\\"A\\">", '
+                       '"rationale": "adds a name"}'])
+    violation = Violation(rule="image-alt", selector="img", html="<img src='a.png'>",
+                          impact="critical", description="Images must have alternate text")
+    match = SourceMatch(path="index.html", line=1, text='<img src="a.png">')
+
+    patch = propose_patch(model, violation, match, b"")
+
+    assert patch is not None
+    assert model.calls[0]["response_schema"] == PATCH_SCHEMA
+    assert model.calls[0]["response_schema"]["required"] == ["old", "new", "rationale"]

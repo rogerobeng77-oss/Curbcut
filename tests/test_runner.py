@@ -397,7 +397,7 @@ def test_raising_model_does_not_abort_the_run(tmp_path):
         def __init__(self):
             self.calls = 0
 
-        def generate(self, prompt, images=None):
+        def generate(self, prompt, images=None, response_schema=None):
             self.calls += 1
             if self.calls == 1:
                 raise RuntimeError("vertex 429 RESOURCE_EXHAUSTED")

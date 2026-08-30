@@ -10,8 +10,18 @@ class FakeModel:
         self._index = 0
         self.calls: list[dict] = []
 
-    def generate(self, prompt: str, images: list[bytes] | None = None) -> str:
-        self.calls.append({"prompt": prompt, "images": images})
+    def generate(
+        self,
+        prompt: str,
+        images: list[bytes] | None = None,
+        response_schema: dict | None = None,
+    ) -> str:
+        # Recorded, not honoured: a double that silently dropped an argument
+        # the real client acts on would let a caller stop passing it and keep
+        # a green suite.
+        self.calls.append(
+            {"prompt": prompt, "images": images, "response_schema": response_schema}
+        )
         assert self._index < len(self._responses), (
             f"FakeModel exhausted after {self._index} call(s); "
             f"got an unexpected call with prompt={prompt!r}"

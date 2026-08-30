@@ -206,7 +206,21 @@ class GeminiModel:
             )
         self._client = client
 
-    def generate(self, prompt: str, images: list[bytes] | None = None) -> str:
+    def generate(
+        self,
+        prompt: str,
+        images: list[bytes] | None = None,
+        response_schema: dict | None = None,
+    ) -> str:
+        """Generate text. With `response_schema`, ask Vertex for JSON mode.
+
+        JSON mode is not a stronger hint than "reply with JSON" in the prompt;
+        it constrains decoding, so the model cannot emit a preamble, a code
+        fence, or trailing commentary around the object. Without it, a caller
+        that json.loads() the reply is relying on the model choosing to behave,
+        and it will not choose that every time -- three of seven patches were
+        rejected as `not_json` in one real run against an unchanged fixture.
+        """
         from google.genai import types
 
         contents: list = [prompt]
@@ -222,7 +236,13 @@ class GeminiModel:
             model=self._model,
             contents=contents,
             config=types.GenerateContentConfig(
-                http_options=types.HttpOptions(timeout=self._timeout_ms)
+                http_options=types.HttpOptions(timeout=self._timeout_ms),
+                **(
+                    {"response_mime_type": "application/json",
+                     "response_schema": response_schema}
+                    if response_schema
+                    else {}
+                ),
             ),
         )
         if response.text is None:

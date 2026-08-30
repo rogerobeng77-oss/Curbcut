@@ -49,6 +49,21 @@ def _strip_fences(text: str) -> str:
     return stripped
 
 
+# Vertex JSON mode constrains decoding to this shape, so the reply cannot
+# arrive wrapped in prose or a code fence. _strip_fences stays anyway: a model
+# without JSON-mode support (and FakeModel, which does not honour the schema)
+# still reaches json.loads through this path.
+PATCH_SCHEMA = {
+    "type": "OBJECT",
+    "properties": {
+        "old": {"type": "STRING"},
+        "new": {"type": "STRING"},
+        "rationale": {"type": "STRING"},
+    },
+    "required": ["old", "new", "rationale"],
+}
+
+
 def propose_patch(model, violation: Violation, match: SourceMatch, screenshot: bytes) -> Patch | None:
     prompt = PATCH_INSTRUCTION.format(
         rule=violation.rule,
@@ -61,12 +76,21 @@ def propose_patch(model, violation: Violation, match: SourceMatch, screenshot: b
         source_line=match.text,
     )
     with span("a11y.propose_patch", rule=violation.rule, path=match.path):
-        reply = model.generate(prompt, images=[screenshot])
+        reply = model.generate(prompt, images=[screenshot], response_schema=PATCH_SCHEMA)
 
     try:
         payload = json.loads(_strip_fences(reply))
     except json.JSONDecodeError:
-        log_event("patch.malformed", severity="WARNING", rule=violation.rule, reason="not_json")
+        # Log what actually came back. The first time this fired in production
+        # the reply was discarded, which left nothing to diagnose from -- only
+        # the knowledge that three patches vanished.
+        log_event(
+            "patch.malformed",
+            severity="WARNING",
+            rule=violation.rule,
+            reason="not_json",
+            reply_head=reply[:200],
+        )
         return None
 
     if not all(key in payload for key in ("old", "new", "rationale")):
