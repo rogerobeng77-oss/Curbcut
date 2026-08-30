@@ -205,24 +205,22 @@ def _wait_until_serving(url: str, timeout: float = 10.0) -> None:
 
 
 def _build_vertex_model(config):
-    """A model.generate(prompt, images) adapter over Vertex AI Gemini.
+    """The Gemini adapter this run uses.
 
-    Imported lazily so this module can be imported (and its pure functions
-    tested) without google-genai or live Vertex credentials present.
+    Deliberately a one-line delegation to substrate.gemini.GeminiModel rather
+    than a second implementation. There used to be a second one here, and it
+    drifted: when generate() gained a response_schema argument for JSON mode,
+    the substrate adapter, the test fake and a test double were all updated
+    and this one was not. Nothing caught it, because every test builds a fake
+    and only production builds this. The run patched nothing and triaged all
+    seven violations with `unexpected keyword argument 'response_schema'`.
+
+    Imported lazily so this module stays importable, and its pure functions
+    testable, without google-genai or live Vertex credentials present.
     """
-    from google import genai
-    from google.genai import types
+    from substrate.gemini import GeminiModel
 
-    client = genai.Client(vertexai=True, project=config.project_id, location=config.vertex_location)
-
-    class VertexModel:
-        def generate(self, prompt: str, images: list[bytes] | None = None) -> str:
-            parts = [prompt]
-            for image in images or []:
-                parts.append(types.Part.from_bytes(data=image, mime_type="image/png"))
-            return client.models.generate_content(model=config.model, contents=parts).text
-
-    return VertexModel()
+    return GeminiModel(config)
 
 
 def main() -> None:
