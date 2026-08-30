@@ -2,6 +2,10 @@
 
 ## Diagram
 
+![Curbcut architecture](curbcut-architecture.svg)
+
+<details><summary>The same thing as mermaid, for anyone who prefers it</summary>
+
 ```mermaid
 flowchart TD
     GH["GitHub repository\npull_request webhook"] -->|opened / synchronize / reopened| PS["Pub/Sub topic\na11y-events"]
@@ -28,6 +32,9 @@ flowchart TD
     SVC -.structured logs.-> LOGGING["Cloud Logging"]
     JOB -.structured logs.-> LOGGING
 ```
+
+</details>
+
 
 ## Components
 

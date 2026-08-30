@@ -15,6 +15,39 @@ insufficient color contrast — these are things a scanner has been able to
 catch for free, for years. Detection was never the bottleneck. Nobody had
 time to act on the report.
 
+It is also worth being concrete about who this costs. A button with no
+accessible name is announced by a screen reader as one word: "button". Not
+"search", not "pay". You are asked to click something with no idea what it
+does. Names and labels matter to people using screen readers; contrast
+matters to anyone with low vision, ageing eyes, or a screen in sunlight,
+which is a far larger population than most teams assume. In everything we
+scanned, contrast was the single most common failure — 1,525 of 4,113.
+
+## We did not want to build on someone else's statistic
+
+The WebAIM figure covers home pages of the top million sites. We wanted to
+know whether it held on a population nobody surveys, so we pointed this
+project's own scanner at 199 real project and documentation sites published
+from GitHub. 130 responded. **127 of them had violations — 97.7%.**
+
+| | |
+|---|---|
+| Reachable sites with at least one violation | **127 of 130 (97.7%)** |
+| Total node-level violations | **4,113** |
+| In rules this agent can patch | **2,430 (59.1%)** |
+| Median per site | **13** |
+
+These are not abandoned websites. *Writing an OS in Rust*, with over 17,000
+stars, has 67 violations this agent can fix. Fastlane's documentation has 99.
+Ionic's has 39.
+
+The harness that produced those numbers is in the repository as
+`bench/scan_fleet.py`, with the raw results, so the figure is reproducible
+rather than asserted. One honest caveat: the denominator is *reachable*
+sites. 69 of the 199 failed to load, mostly because the target list
+constructs a `github.io` URL for repositories that declare no homepage, so a
+share of those are bad guesses rather than dead hosts.
+
 There's also a clock on this now. The US Justice Department's Title II rule
 under the ADA makes WCAG 2.1 AA a legal requirement for state and local
 government web content — phased in by population served: April 26, 2027 for
@@ -129,7 +162,27 @@ cannot prove: if the final verification scan can't run, or a rejected patch
 is stuck on disk, the run produces no pull request at all rather than one
 that mixes verified and unverified changes under a single "fixed" banner.
 
-97 tests back this, all running against fakes and a real local headless
-browser scan of the checked-in fixture — no cloud credentials required to
-run the suite. A live pull request from this agent against its demo fixture
-repository is here: https://github.com/rogerkorantenng/a11y-demo-fixture/pull/3
+## It runs on code it has never seen
+
+The demo fixture is a page built to contain exactly the defects the agent
+knows how to fix, which proves the loop works and proves nothing about the
+world. So we forked three real open-source projects and ran it against them.
+
+| Repository | Violations | Verified | Triaged |
+|---|---|---|---|
+| a landing page template | 67 | 23 | 44 |
+| Dopefolio, a portfolio template | 33 | 13 | 20 |
+| a personal portfolio | 27 | 4 | 23 |
+
+Each opened a real pull request. The verified fixes on the first spanned
+three rule types — `button-name`, `color-contrast` and `image-alt` — on
+markup nobody wrote for us.
+
+The triage numbers are the honest part. On that first run, 39 of the 44 were
+rules this agent does not attempt at all, and 5 were ones where the model
+could not produce a usable edit. It fixed what it could prove and handed back
+the rest, labelled.
+
+103 tests back this, all running against fakes and a real local headless
+browser scan of the checked-in fixture — no cloud credentials required to run
+the suite.
