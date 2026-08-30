@@ -192,6 +192,21 @@ and Cloud Trace through OpenTelemetry. PyGithub opens the pull request.
 The console is plain HTML, CSS and JavaScript. No framework. It scans clean
 against this product's own scanner.
 
+## Data sources
+
+- **The page under remediation**, rendered with Playwright. Nothing else from
+  the repository is retained beyond the lifetime of one run's temporary
+  checkout.
+- **axe-core's rule set** — accessibility violations, not user data.
+- **The GitHub pull request event** — repository, PR number, head branch and
+  head SHA.
+- **`bench/targets.json`** — 199 public repositories with a published site,
+  collected from the GitHub search API. Only their public HTML is fetched.
+
+Nothing is collected about the end users of any scanned site. This agent acts
+on source code, not on traffic. No personal data is stored, and the Firestore
+records hold run metadata, patch diffs and the audit trail only.
+
 ## More
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) — the diagram and how the pieces fit
