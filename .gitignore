@@ -13,3 +13,7 @@ DEVPOST.md
 SOCIAL.md
 DEMO_SCRIPT.md
 DEMO_STEPS.md
+
+# LibreOffice lock files, and the deck itself (submission scaffolding)
+.~lock.*#
+curbcut-intro.pptx
