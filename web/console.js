@@ -256,6 +256,11 @@ async function select(runId, runs) {
 }
 
 async function boot() {
+  // Cloud Run cold-starts, so the first fetch can take seconds. Saying nothing
+  // for that long reads as an empty product rather than a slow one.
+  tallyEl.textContent = "loading";
+  detailEl.innerHTML = `<div class="empty"><p>Loading runs\u2026</p></div>`;
+
   let runs = [];
   try {
     runs = await json("/api/runs");
