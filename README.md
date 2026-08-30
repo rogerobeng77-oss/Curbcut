@@ -92,6 +92,28 @@ All tests use `substrate.fakes.FakeFirestore` / `FakeModel` and a real (but
 local) headless-browser scan of the checked-in `fixture/` — no GCP
 credentials are needed to run the suite.
 
+### 2b. Reproduce the fleet benchmark (optional, needs network)
+
+The headline figure in the write-ups — that 97.7% of reachable real sites
+carry at least one violation — is not a citation. It is a measurement this
+repo makes, and you can re-make it:
+
+```bash
+uv run python bench/scan_fleet.py bench/targets.json /tmp/out.jsonl 20
+```
+
+That scans the first 20 targets and appends one JSON row per site. Drop the
+trailing number to run all 199. `bench/results.jsonl` and `bench/summary.json`
+hold the run the write-ups quote.
+
+Two things to know before quoting a number from it. The denominator is
+**reachable** sites, not attempted ones: 69 of the 199 were unreachable,
+largely because `bench/targets.json` constructs a `github.io` URL for repos
+that declare no homepage, so a share of those failures are bad guesses rather
+than dead hosts. And the counts are node-level, matching what `app/scanner.py`
+reports during a real remediation run, not the number of distinct rules — the
+module docstring explains why it does not simply call `scan_page` in a loop.
+
 ### 3. Run the service locally
 
 ```bash

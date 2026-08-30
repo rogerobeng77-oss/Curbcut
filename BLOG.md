@@ -129,7 +129,7 @@ cannot prove: if the final verification scan can't run, or a rejected patch
 is stuck on disk, the run produces no pull request at all rather than one
 that mixes verified and unverified changes under a single "fixed" banner.
 
-96 tests back this, all running against fakes and a real local headless
+97 tests back this, all running against fakes and a real local headless
 browser scan of the checked-in fixture — no cloud credentials required to
 run the suite. A live pull request from this agent against its demo fixture
 repository is here: https://github.com/rogerkorantenng/a11y-demo-fixture/pull/3
