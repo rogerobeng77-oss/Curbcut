@@ -308,3 +308,62 @@ body {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+
+/* ---------- filters ---------- */
+
+.filters { display: flex; gap: 6px; margin: 12px 0 0; }
+
+.chip {
+  font: 500 12.5px/1 var(--sans);
+  padding: 6px 10px;
+  background: var(--paper);
+  color: var(--ink-2);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.chip:hover { background: var(--sunk); }
+.chip[aria-pressed="true"] {
+  background: var(--ink); color: var(--paper); border-color: var(--ink);
+}
+/* No opacity here: .7 on --ink-2 drops the count to 3.4:1 against the chip.
+   --ink-3 is the already-verified 4.96:1 token. Caught by axe on our own UI. */
+.chip .n { font-family: var(--mono); color: var(--ink-3); margin-left: 3px; }
+.chip[aria-pressed="true"] .n { color: var(--paper); opacity: .75; }
+
+/* Announced to screen readers when a filter changes the list, without taking
+   space in the visual layout. */
+.sr-live {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+}
+
+.row[hidden] { display: none; }
+
+/* ---------- rendered markup ---------- */
+
+.render {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  margin: 0 0 8px;
+}
+.render figure { margin: 0; }
+.render figcaption {
+  font: 500 11px/1 var(--mono);
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-2); margin: 0 0 5px;
+}
+.mini {
+  width: 100%; height: 92px;
+  border: 1px solid var(--rule); border-radius: 3px;
+  background: #fff; display: block;
+}
+.render figure:first-child .mini { border-left: 3px solid var(--no); }
+.render figure:last-child  .mini { border-left: 3px solid var(--ok); }
+
+.render-note {
+  margin: 0 0 10px;
+  font: 400 11.5px/1.45 var(--sans); color: var(--ink-3);
+}
+
+@media (max-width: 620px) { .render { grid-template-columns: 1fr; } }

@@ -25,6 +25,26 @@ const REASONS = {
   resolved:         "Verified. The re-scan found this clear.",
 };
 
+/* The scanned markup, rendered. `sandbox` with no allow-* tokens is doing real
+ * work: this is third-party HTML from whatever repository was scanned, so it
+ * gets no scripts, no forms, no same-origin access, and no navigation. The
+ * srcdoc carries a minimal reset only, deliberately not the page's stylesheet
+ * — we never captured it, and faking one would misrepresent the fix. */
+/* A patch to a stylesheet is a CSS rule, not an element. Putting
+ * `.heading-sec__sub { color: #555 }` in an iframe renders the literal text
+ * and tells a reader nothing, so those rows show the diff alone. */
+function isMarkup(source) {
+  return String(source || "").trim().startsWith("<");
+}
+
+function frame(html) {
+  const doc = `<!doctype html><meta charset="utf-8">
+    <style>body{margin:0;padding:10px;font:14px/1.5 system-ui,sans-serif;
+      background:#fff;color:#16191d}img{max-width:100%%}</style>${html}`;
+  return `<iframe class="mini" sandbox loading="lazy" title="Rendered markup"
+            srcdoc="${esc(doc)}"></iframe>`;
+}
+
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
@@ -87,33 +107,52 @@ function trackOf(stages) {
   });
 }
 
+/* What the four stages must have been, given how this violation ended.
+ *
+ * The earlier version paired the nth verified patch with the nth audit entry
+ * for the same rule. That works only while every violation of a rule ends the
+ * same way. On a run with 33 violations, mostly color-contrast, some verified
+ * and some triaged, the ordinals slide apart and rows start showing another
+ * violation's track: "Verified" beside a red segment, or beside no segments at
+ * all. The reason is already on the row, and it determines the stages exactly,
+ * so derive them instead of matching positions.
+ */
+function trackFor(verdict, reason) {
+  const done = (n) => STAGES.map((step, i) =>
+    ({ step, state: i < n ? "done" : "none" }));
+  const stopAt = (n) => done(n).map((seg, i) =>
+    (i === n ? { ...seg, state: "failed" } : seg));
+
+  if (verdict === "pass") return done(4);
+  switch (reason) {
+    case "not_located":      return stopAt(0);
+    case "unsupported_rule": return stopAt(0);
+    case "no_patch":         return stopAt(1);
+    case "apply_failed":     return stopAt(2);
+    default:                 return stopAt(3);  // reached verify and failed it
+  }
+}
+
 /* Prefer the run record: it carries the diff and the model's reasoning, which
  * the audit trail never stored. Fall back to the trail for runs written before
  * that schema existed, which render every row minus the diff. */
 function ledgerOf(run, entries) {
-  const audit = violationsFromAudit(entries);
   const verified = run.verified_patches || [];
   const triaged = run.triaged_items || [];
 
   if (verified.length || triaged.length) {
-    const stagesFor = (rule, nth) =>
-      (audit.filter((v) => v.rule === rule)[nth] || {}).stages || {};
-    const seen = {};
-    const take = (rule) => { seen[rule] = (seen[rule] ?? -1) + 1; return seen[rule]; };
     return [
       ...verified.map((p) => ({
-        rule: p.rule, verdict: "pass", reason: "resolved",
-        patch: p, stages: stagesFor(p.rule, take(p.rule)),
+        rule: p.rule, verdict: "pass", reason: "resolved", patch: p,
       })),
       ...triaged.map((t) => ({
-        rule: t.rule, verdict: "fail", reason: t.reason || "reverted",
-        patch: null, stages: stagesFor(t.rule, take(t.rule)),
+        rule: t.rule, verdict: "fail", reason: t.reason || "reverted", patch: null,
       })),
     ];
   }
 
-  return audit.map((v) => ({
-    rule: v.rule, patch: null, stages: v.stages, ...verdictOf(v.stages),
+  return violationsFromAudit(entries).map((v) => ({
+    rule: v.rule, patch: null, ...verdictOf(v.stages),
   }));
 }
 
@@ -189,6 +228,12 @@ function rowHtml(item, track, index) {
     </button>
     <div class="panel" id="p-${index}" hidden>
       ${p ? `<p class="where">${esc(p.path)}:${esc(p.line)}</p>
+      ${isMarkup(p.old) ? `<div class="render">
+        <figure><figcaption>Before</figcaption>${frame(p.old)}</figure>
+        <figure><figcaption>After</figcaption>${frame(p.new)}</figure>
+      </div>
+      <p class="render-note">Rendered without the page's own stylesheet, so this
+      shows the element as markup, not as it appears in context.</p>` : ""}
       <div class="diff">
         <pre class="del">- ${esc(p.old)}</pre>
         <pre class="add">+ ${esc(p.new)}</pre>
@@ -228,9 +273,52 @@ function renderDetail(run, entries) {
       <h2>Verification ledger</h2>
       <p>One row per violation. Open a row for the change and the reasoning.</p>
     </div>
+    <div class="filters" role="group" aria-label="Filter the ledger">
+      <button type="button" class="chip" data-filter="all" aria-pressed="true">
+        All <span class="n">${items.length}</span></button>
+      <button type="button" class="chip" data-filter="pass" aria-pressed="false">
+        Verified <span class="n">${items.filter((i) => i.verdict === "pass").length}</span></button>
+      <button type="button" class="chip" data-filter="fail" aria-pressed="false">
+        Triaged <span class="n">${items.filter((i) => i.verdict !== "pass").length}</span></button>
+    </div>
+    <p class="sr-live" id="filter-status" role="status"></p>
     <ol class="ledger">
-      ${items.map((item, i) => rowHtml(item, trackOf(item.stages), i)).join("")}
+      ${items.map((item, i) => rowHtml(item, trackFor(item.verdict, item.reason), i)).join("")}
     </ol>`;
+
+  const rows = [...detailEl.querySelectorAll(".row")];
+
+  detailEl.querySelectorAll(".chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const want = chip.dataset.filter;
+      detailEl.querySelectorAll(".chip").forEach((c) =>
+        c.setAttribute("aria-pressed", String(c === chip)));
+      let shown = 0;
+      rows.forEach((row) => {
+        const match = want === "all" || row.dataset.verdict === want;
+        row.hidden = !match;
+        if (match) shown += 1;
+      });
+      // Announce it: a filter that silently changes the list is invisible to
+      // anyone not watching the rows move.
+      document.getElementById("filter-status").textContent =
+        `Showing ${shown} of ${rows.length} violations.`;
+    });
+  });
+
+  /* j and k move between rows the way they do in a code review; Enter and
+   * Space already open a row because each one is a real button. */
+  detailEl.addEventListener("keydown", (event) => {
+    if (event.key !== "j" && event.key !== "k") return;
+    if (event.target.tagName === "INPUT") return;
+    const visible = rows.filter((r) => !r.hidden).map((r) => r.querySelector(".row-btn"));
+    const at = visible.indexOf(document.activeElement);
+    const next = event.key === "j" ? at + 1 : at - 1;
+    if (visible[next]) {
+      visible[next].focus();
+      event.preventDefault();
+    }
+  });
 
   detailEl.querySelectorAll(".row-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
